@@ -10,6 +10,7 @@ const isRender = ref<boolean>(false);
 
 onMounted(async () => {
     await store.dispatch('fetchProducts');
+    console.log(`file: HomePage.vue:13 > store:`, store);
     productsByCategories.value = store.getters['prodByCate'];
     if (productsByCategories.value.length > 0) {
         isRender.value = true;

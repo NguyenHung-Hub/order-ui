@@ -3,6 +3,11 @@ import Input from '../components/Input/Input.vue';
 import Button from '../components/Button.vue';
 import * as authService from '../services/auth.service';
 import { ref } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+
+const store = useStore();
+const router = useRouter();
 
 const email = ref<string>('');
 const password = ref<string>('');
@@ -21,6 +26,8 @@ async function handleLogin() {
             console.log(`file: LoginPage.vue:22 > email.value, password.value:`, email.value, password.value);
             const result = await authService.login(email.value, password.value);
             console.log(`file: LoginPage.vue:14 > result:`, result);
+            await store.dispatch('setUser', result);
+            router.push('/');
         }
     } catch (error) {
         console.log(`file: LoginPage.vue:17 > error:`, error);

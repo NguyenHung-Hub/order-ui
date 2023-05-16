@@ -16,3 +16,4 @@ export default interface IUser extends ITimeStamps {
 }
 
 export interface IUserResponse extends Omit<IUser, 'password'> {}
+export interface IRequestLogin extends Pick<IUser, 'email' | 'password'> {}

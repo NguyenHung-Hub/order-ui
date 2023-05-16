@@ -16,6 +16,8 @@ import CreateFoodPage from './pages/CreateFoodPage.vue';
 import LoginPage from './pages/LoginPage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
 
+import store from './store';
+
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -38,6 +40,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/category/:slug',
                 name: 'CategoryPage',
                 component: CategoryPage,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -50,6 +53,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/cart',
                 name: 'CartPage',
                 component: CartPage,
+                meta: { requiresAuth: false },
             },
         ],
     },
@@ -62,6 +66,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/user',
                 name: 'UserPage',
                 component: UserPage,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -74,6 +79,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/qr',
                 name: 'QrPage',
                 component: QrPage,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -86,6 +92,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/account',
                 name: 'CreateAccount',
                 component: CreateAccount,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -100,6 +107,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'detail',
                 name: 'ProductDetailPage',
                 component: ProductDetailPage,
+                meta: { requiresAuth: false },
             },
         ],
     },
@@ -112,6 +120,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/table',
                 name: 'DiningTablePage',
                 component: DiningTablePage,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -124,11 +133,13 @@ const routes: RouteRecordRaw[] = [
                 path: '',
                 name: 'FoodPage',
                 component: FoodPage,
+                meta: { requiresAuth: true },
             },
             {
                 path: 'create',
                 name: 'CreateFoodPage',
                 component: CreateFoodPage,
+                meta: { requiresAuth: true },
             },
         ],
     },
@@ -143,6 +154,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/login',
                 name: 'LoginPage',
                 component: LoginPage,
+                meta: { requiresAuth: false },
             },
         ],
     },
@@ -156,6 +168,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/register',
                 name: 'RegisterPage',
                 component: RegisterPage,
+                meta: { requiresAuth: false },
             },
         ],
     },
@@ -165,6 +178,21 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
     linkActiveClass: 'link-active',
+});
+
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = store.getters['isAuthenticated'];
+    console.log(`file: router.ts:179 > isAuthenticated:`, isAuthenticated);
+
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (isAuthenticated) {
+            next();
+        } else {
+            next('/login');
+        }
+    } else {
+        next();
+    }
 });
 
 export default router;
