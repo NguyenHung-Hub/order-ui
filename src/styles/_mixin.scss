@@ -1,0 +1,28 @@
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@mixin col-center {
+    @include flex-center();
+    flex-direction: column;
+}
+
+@mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@mixin square($size, $radius: 0px) {
+    width: $size;
+    height: $size;
+    border-radius: $radius;
+}
+
+@mixin circle($size) {
+    width: $size;
+    height: $size;
+    object-fit: cover;
+    border-radius: 50%;
+}
