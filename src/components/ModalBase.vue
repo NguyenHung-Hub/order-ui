@@ -19,7 +19,7 @@ function emitCloseModal() {
             <div class="modal__container">
                 <div class="modal__header" v-if="props.header">
                     <Button class="modal__header--btn" :click="emitCloseModal">
-                        <CrossIcon />
+                        <CrossIcon :color="`#ccc`" />
                     </Button>
                 </div>
                 <div class="modal__body">

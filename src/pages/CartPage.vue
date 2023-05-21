@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue';
+import { ref, reactive, watchEffect } from 'vue';
 import ScreenBase from '../components/ScreenBase.vue';
 import Button from '../components/Button.vue';
 import InputQuantity from '../components/InputQuantity.vue';
 import CrossIcon from '../components/Icons/CrossIcon.vue';
-import { ICartItem } from '../interfaces/cart.interface';
+import { ICartItem, ICartItemRequest } from '../interfaces/cart.interface';
 import { useStore } from 'vuex';
 import { formatMoney } from '../utils/format';
+import * as invoiceService from '../services/invoice.service';
+import { IInvoice } from '../interfaces/invoice.interface';
+import ModalLoading from '../components/Modal/ModalLoading.vue';
 
 const cartItems = ref<ICartItem[]>([]);
 const countCart = ref<string>('');
 const invoicePrice = ref<number>(0);
 const store = useStore();
 
+const status = ref<'loading' | 'success' | 'error'>('loading');
+const isShowModal = ref<boolean>(false);
+
 watchEffect(() => {
     cartItems.value = store.getters['cartItems'];
     invoicePrice.value = store.getters['invoicePrice'];
-    const count = store.getters['countCart'];
+    const count = store.getters['countCartItem'];
     if (count > 0) {
         countCart.value = `(${count})`;
     } else {
@@ -33,12 +39,47 @@ async function updateQuantity(value: number, cartItem: ICartItem) {
 async function removeCartItem(cartItem: ICartItem) {
     await store.dispatch('removeCartItem', cartItem);
 }
+
+async function handleOrder() {
+    toggleShowModal();
+    status.value = 'loading';
+
+    if (cartItems.value.length > 0) {
+        const cartItemRequest = cartItems.value.map(
+            (item): ICartItemRequest => ({
+                productId: item.product._id as string,
+                price: item.product.priceSale,
+                quantity: item.quantity,
+            }),
+        );
+
+        try {
+            const newInvoice: IInvoice = {
+                shopId: store.getters['user'].shopId,
+                customerId: store.getters['user']._id,
+                carts: cartItemRequest,
+            };
+            const result = await invoiceService.create(newInvoice);
+            status.value = 'success';
+            await store.dispatch('clearCart');
+            cartItems.value = [];
+            console.log(`file: CartPage.vue:48 > result:`, result);
+        } catch (error) {
+            status.value = 'error';
+            console.log(`file: CartPage.vue:50 > error:`, error);
+        }
+    }
+}
+
+function toggleShowModal() {
+    isShowModal.value = !isShowModal.value;
+}
 </script>
 
 <template>
     <ScreenBase :title="`Giỏ hàng ${countCart}`" class="cart__wrapper" hasFooter>
         <div class="cart__body" v-if="cartItems.length > 0">
-            <div class="cart__item" v-for="item in cartItems">
+            <div class="cart__item" v-for="item in cartItems" :key="item.product._id">
                 <img class="product__preview" :src="item.product.photo" alt="" />
                 <div class="cart__info">
                     <div class="product__name">{{ item.product.name }}</div>
@@ -54,7 +95,7 @@ async function removeCartItem(cartItem: ICartItem) {
                 </Button>
             </div>
         </div>
-        <div class="label" v-else>Chưa gọi món</div>
+        <div class="label" v-else>Giỏ hàng trống</div>
 
         <template v-slot:footer>
             <div class="cart__footer">
@@ -63,16 +104,27 @@ async function removeCartItem(cartItem: ICartItem) {
                     <span class="invoice-price"> {{ formatMoney(invoicePrice) }} đ</span>
                 </div>
 
-                <Button class="order-btn">Đặt món {{ countCart }}</Button>
+                <Button class="order-btn" :click="handleOrder">Đặt món {{ countCart }}</Button>
             </div>
         </template>
     </ScreenBase>
+    <ModalLoading
+        :status="status"
+        @on-close="toggleShowModal"
+        v-if="isShowModal"
+        :loading-msg="'Đang gọi món'"
+        :success-msg="'Đã gọi món'"
+        :error-msg="'Gọi món lỗi'"
+    />
 </template>
 
 <style scoped lang="scss">
 @use '../styles' as *;
 
 .cart__wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
     .cart__body {
         background-color: #583939;
 

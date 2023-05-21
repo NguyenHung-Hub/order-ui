@@ -28,8 +28,8 @@ const props = withDefaults(defineProps<Props>(), {
         <div class="scroll-section">
             <div class="content-section">
                 <CardProduct
-                    v-for="product in props.products"
-                    :key="product._id"
+                    v-for="(product, index) in props.products"
+                    :key="index + 1"
                     :product="product"
                     class="margin-right"
                 />

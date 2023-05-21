@@ -15,6 +15,7 @@ import FoodPage from './pages/FoodPage.vue';
 import CreateFoodPage from './pages/CreateFoodPage.vue';
 import LoginPage from './pages/LoginPage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
+import OrderHistoryPage from './pages/OrderHistoryPage.vue';
 
 import store from './store';
 
@@ -169,6 +170,19 @@ const routes: RouteRecordRaw[] = [
                 name: 'RegisterPage',
                 component: RegisterPage,
                 meta: { requiresAuth: false },
+            },
+        ],
+    },
+    {
+        path: '/',
+        name: 'HistoryEmptyLayout',
+        component: EmptyLayout,
+        children: [
+            {
+                path: '/history',
+                name: 'OrderHistoryPage',
+                component: OrderHistoryPage,
+                meta: { requiresAuth: true },
             },
         ],
     },

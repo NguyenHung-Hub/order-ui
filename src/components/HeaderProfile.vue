@@ -1,18 +1,26 @@
-<script setup lang='ts'>
+<script setup lang="ts">
+import { ref, watchEffect } from 'vue';
+import { useStore } from 'vuex';
+import IUser from '../interfaces/auth.interface';
+
+const store = useStore();
+const user = ref<IUser>();
+watchEffect(() => {
+    user.value = store.getters['user'];
+});
 </script>
 
 <template>
     <div class="header-profile__wrapper">
-        <img class="avatar" src="https://t3.ftcdn.net/jpg/03/66/03/60/360_F_366036054_Lm4VjnOHAN48s6XLNu5JsDoIIhZX7QkJ.jpg"
-            alt="">
+        <img class="avatar" :src="user?.avatar" alt="" />
         <div class="info__wrapper">
-            <div class="info_name">hunghusir</div>
-            <div class="info__role">Quản lý</div>
+            <div class="info_name">{{ user?.fullName }}</div>
+            <div class="info__role">{{ user?.role.name }}</div>
         </div>
     </div>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 @use '../styles/index' as *;
 
 .header-profile__wrapper {
@@ -40,6 +48,8 @@
         .info__role {
             padding: 2px 0;
 
+            text-transform: capitalize;
+
             font-size: 1.8rem;
             font-weight: bold;
             color: #fff;
@@ -56,7 +66,5 @@
             border-radius: 24px;
         }
     }
-
-
 }
 </style>

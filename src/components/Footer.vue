@@ -5,7 +5,6 @@ import CartIcon from './Icons/CartIcon.vue';
 import HomeIcon from './Icons/HomeIcon.vue';
 import UserIcon from './Icons/UserIcon.vue';
 
-import { useRoute } from 'vue-router';
 import HomeDisableIcon from './Icons/HomeDisableIcon.vue';
 import CartDisableIcon from './Icons/CartDisableIcon.vue';
 import UserDisableIcon from './Icons/UserDisableIcon.vue';
@@ -13,16 +12,22 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 const countCart = ref<number>(0);
+const roleName = {
+    MANAGER: 'manager',
+    STAFF: 'staff',
+    CHEF: 'chef',
+    CUSTOMER: 'customer',
+};
 
 watchEffect(() => {
-    countCart.value = store.getters['countCart'];
+    countCart.value = store.getters['countCartItem'];
 });
 </script>
 
 <template>
     <div class="footer-wrapper">
         <div class="nav-footer">
-            <div class="nav-item">
+            <div class="nav-item" v-if="store.getters['userRole'] == roleName.CUSTOMER">
                 <RouterLink active-class="link-active" to="/" v-slot="{ isActive }">
                     <Button class="nav-btn" vertical>
                         <HomeIcon class="nav-icon" v-if="isActive" />
@@ -31,7 +36,7 @@ watchEffect(() => {
                     </Button>
                 </RouterLink>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" v-if="store.getters['userRole'] == roleName.CUSTOMER">
                 <RouterLink to="/cart" v-slot="{ isActive }">
                     <Button class="nav-btn nav-cart" vertical>
                         <CartIcon class="nav-icon" v-if="isActive" />

@@ -59,6 +59,9 @@ const categoryStore: StoreBase = {
                 state.cart.items.push(itemPayload);
             }
         },
+        clearCart(state: CartState) {
+            state.cart.items = [];
+        },
     },
     actions: {
         async fetchCategories(context: ActionContext<CartState, RootState>) {
@@ -81,12 +84,16 @@ const categoryStore: StoreBase = {
         updateQuantity(context: ActionContext<CartState, RootState>, item: ICartItem) {
             context.commit('updateQuantity', item);
         },
+
+        clearCart(context: ActionContext<CartState, RootState>) {
+            context.commit('clearCart');
+        },
     },
 
     getters: {
         cart: (state: CartState) => state.cart,
         cartItems: (state: CartState) => state.cart.items,
-        countCart: (state: CartState) => {
+        countCartItem: (state: CartState) => {
             if (state.cart.items.length > 0) {
                 return state.cart.items.reduce((acc, curr) => acc + curr.quantity, 0);
             } else {

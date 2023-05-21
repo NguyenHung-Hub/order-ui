@@ -63,6 +63,13 @@ const authStore: StoreBase = {
             }
             return false;
         },
+        userRole: (state: AuthState) => {
+            if (state.user) {
+                return state.user?.role.name;
+            } else {
+                return 'customer';
+            }
+        },
     },
 };
 

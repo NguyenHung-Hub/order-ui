@@ -117,6 +117,7 @@ function Click() {
     }
 
     &.full {
+        justify-content: space-between;
         width: 100%;
     }
 

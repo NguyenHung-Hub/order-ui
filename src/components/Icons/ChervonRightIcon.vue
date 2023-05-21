@@ -2,28 +2,18 @@
 export interface IconProps {
     width?: string;
     height?: string;
+    color?: string;
 }
 const props = withDefaults(defineProps<IconProps>(), {
-    width: "1.6rem",
-    height: "1.6rem",
+    width: '1.6rem',
+    height: '1.6rem',
+    color: '#444',
 });
 </script>
 
 <template>
-    <svg
-        :width="width"
-        :height="height"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path
-            d="M6 12L10 8L6 4"
-            stroke="#444"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        />
+    <svg :width="width" :height="height" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 12L10 8L6 4" :stroke="color" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
 </template>
 
