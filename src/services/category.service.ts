@@ -1,9 +1,9 @@
 import httpRequest from '../utils/httpRequest';
 import { ICategory } from '../interfaces/category.interface';
 
-export const createCategory = async (name: string): Promise<ICategory | undefined> => {
+export const createCategory = async (name: string, shopId: string): Promise<ICategory | undefined> => {
     try {
-        const result = await httpRequest.post('/category', { name });
+        const result = await httpRequest.post('/category', { name, shopId });
 
         return result.data.data as ICategory;
     } catch (error) {

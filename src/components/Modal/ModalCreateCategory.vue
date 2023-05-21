@@ -5,6 +5,9 @@ import ModalBase from '../ModalBase.vue';
 import { createCategory } from '../../services/category.service';
 import Input from '../Input/Input.vue';
 import { ICategory } from '../../interfaces/category.interface';
+import { useStore } from 'vuex';
+
+const store = useStore();
 
 const emit = defineEmits<{ (event: 'onClose' | 'onUpdate', value?: ICategory): void }>();
 const category = ref<string>('');
@@ -18,7 +21,7 @@ function categoryOnChange(value: string) {
 
 async function handleCreateCategory() {
     if (category.value.trim() != '') {
-        const result = await createCategory(category.value);
+        const result = await createCategory(category.value, store.getters['user'].shopId);
         console.log(`file: ModalCreateCategory.vue:20 > result:`, result);
         emit('onUpdate', result);
     }
