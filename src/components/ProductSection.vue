@@ -4,6 +4,7 @@ import CardProduct from './CardProduct.vue';
 import ChervonRightIcon from '../components/Icons/ChervonRightIcon.vue';
 import { IProduct, IProductsByCategories } from '../interfaces/product.interface';
 import { ICategory } from '../interfaces/category.interface';
+import { useStore } from 'vuex';
 
 interface Props {
     title?: string;
@@ -11,16 +12,21 @@ interface Props {
     categoryName?: string;
     products?: IProduct[] | undefined;
 }
+
+const store = useStore();
+
 const props = withDefaults(defineProps<Props>(), {
     products: undefined,
 });
+
+const shopName = store.getters['shopName'];
 </script>
 
 <template>
     <div class="wrapper-section">
         <div class="head-section">
             <h2 class="title-section">{{ props.title || props.categoryName }}</h2>
-            <Button class="btn-all" :to="`/category/${props.categorySlug}`">
+            <Button class="btn-all" :to="`/${shopName}/category/${props.categorySlug}`">
                 <span>Xem tất cả</span>
                 <ChervonRightIcon />
             </Button>

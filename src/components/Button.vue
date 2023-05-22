@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 interface Props {
     to?: string;
+    toName?: string;
     primary?: boolean;
     secondary?: boolean;
     success?: boolean;
@@ -24,6 +25,8 @@ function Click() {
         props.click();
     } else if (props?.to) {
         router.push(props.to);
+    } else if (props?.toName) {
+        router.push({ name: props.toName });
     }
 }
 </script>

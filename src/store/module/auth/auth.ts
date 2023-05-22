@@ -1,10 +1,10 @@
 import { ActionContext } from 'vuex';
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
-import IUser, { IRequestLogin } from '../../../interfaces/auth.interface';
+import IUser, { IRequestLogin, IUserResponse } from '../../../interfaces/auth.interface';
 import * as authService from '../../../services/auth.service';
 
 interface AuthState {
-    user: IUser | null;
+    user: IUserResponse | null;
     isAuthenticated: boolean;
     error: any;
 }
@@ -14,7 +14,7 @@ const authStore: StoreBase = {
         let userLocal;
         let isAuth = false;
         if (localStorage.getItem('user')) {
-            userLocal = JSON.parse(localStorage.getItem('user') as string) as IUser;
+            userLocal = JSON.parse(localStorage.getItem('user') as string) as IUserResponse;
             console.log(`file: auth.ts:17 > userLocal:`, userLocal);
             isAuth = true;
         } else {
@@ -28,7 +28,7 @@ const authStore: StoreBase = {
         };
     },
     mutations: {
-        setUser(state: AuthState, userPayload: IUser) {
+        setUser(state: AuthState, userPayload: IUserResponse) {
             state.user = userPayload;
             state.isAuthenticated = true;
             console.log(state);
@@ -49,7 +49,7 @@ const authStore: StoreBase = {
                 context.commit('setError', error);
             }
         },
-        setUser(context: ActionContext<AuthState, RootState>, user: IUser) {
+        setUser(context: ActionContext<AuthState, RootState>, user: IUserResponse) {
             context.commit('setUser', user);
             localStorage.setItem('user', JSON.stringify(user));
         },
@@ -57,6 +57,7 @@ const authStore: StoreBase = {
 
     getters: {
         user: (state: AuthState) => state.user,
+        shopName: (state: AuthState) => state.user?.shop.name,
         isAuthenticated: (state: AuthState) => {
             if (state.user) {
                 return true;

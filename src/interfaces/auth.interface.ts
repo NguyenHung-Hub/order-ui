@@ -1,8 +1,9 @@
 import { IArea } from './area.interface';
 import { ITimeStamps } from './index.interface';
 import { IRole } from './role.interface';
+import { IShop } from './shop.interface';
 
-export default interface IUser extends ITimeStamps {
+interface Base extends ITimeStamps {
     _id?: string;
     fullName?: string;
     email: string;
@@ -12,8 +13,13 @@ export default interface IUser extends ITimeStamps {
     address?: string;
     areas: IArea[] | [];
     role: IRole;
-    managerId?: string;
+}
+export default interface IUser extends Base {
+    shopId: string;
 }
 
-export interface IUserResponse extends Omit<IUser, 'password'> {}
+export interface IUserResponse extends Omit<Base, 'password'> {
+    shop: IShop;
+}
+
 export interface IRequestLogin extends Pick<IUser, 'email' | 'password'> {}

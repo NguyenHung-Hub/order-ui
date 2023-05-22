@@ -6,7 +6,7 @@ import { formatMoney } from '../utils/format';
 import Button from './Button.vue';
 import { useStore } from 'vuex';
 import { ICartItem } from '../interfaces/cart.interface';
-
+import { routesName } from '../router';
 interface Props {
     product: IProduct;
 }
@@ -18,7 +18,7 @@ const store = useStore();
 function showDetail() {
     console.log(props.product?.slug);
 
-    router.push({ path: '/detail', query: { p: props.product?.slug } });
+    router.push({ name: routesName.ProductDetailPage, query: { p: props.product?.slug } });
 }
 
 async function handleAddCartItem() {

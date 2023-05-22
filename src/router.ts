@@ -19,170 +19,361 @@ import OrderHistoryPage from './pages/OrderHistoryPage.vue';
 
 import store from './store';
 
+// const routes: RouteRecordRaw[] = [
+//     {
+//         path: '/',
+//         name: 'DefaultLayout',
+//         component: DefaultLayout,
+//         children: [
+//             {
+//                 path: '/',
+//                 name: 'HomePage',
+//                 component: HomePage,
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'CategoryDefaultLayout',
+//         component: DefaultLayout,
+//         children: [
+//             {
+//                 path: '/category/:slug',
+//                 name: 'CategoryPage',
+//                 component: CategoryPage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'CartEmptyLayout',
+//         component: EmptyLayout,
+//         children: [
+//             {
+//                 path: '/cart',
+//                 name: 'CartPage',
+//                 component: CartPage,
+//                 meta: { requiresAuth: false },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'OnlyFooterLayout',
+//         component: OnlyFooterLayout,
+//         children: [
+//             {
+//                 path: '/user',
+//                 name: 'UserPage',
+//                 component: UserPage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'QrOnlyFooterLayout',
+//         component: OnlyFooterLayout,
+//         children: [
+//             {
+//                 path: '/qr',
+//                 name: 'QrPage',
+//                 component: QrPage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'AccountOnlyFooterLayout',
+//         component: OnlyFooterLayout,
+//         children: [
+//             {
+//                 path: '/account',
+//                 name: 'CreateAccount',
+//                 component: CreateAccount,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+
+//     {
+//         path: '/',
+//         name: 'EmptyLayout',
+//         component: EmptyLayout,
+
+//         children: [
+//             {
+//                 path: 'detail',
+//                 name: 'ProductDetailPage',
+//                 component: ProductDetailPage,
+//                 meta: { requiresAuth: false },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'TableEmptyLayout',
+//         component: EmptyLayout,
+//         children: [
+//             {
+//                 path: '/table',
+//                 name: 'DiningTablePage',
+//                 component: DiningTablePage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/food',
+//         name: 'FoodEmptyLayout',
+//         component: EmptyLayout,
+//         children: [
+//             {
+//                 path: '',
+//                 name: 'FoodPage',
+//                 component: FoodPage,
+//                 meta: { requiresAuth: true },
+//             },
+//             {
+//                 path: 'create',
+//                 name: 'CreateFoodPage',
+//                 component: CreateFoodPage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+
+//     {
+//         path: '/',
+//         name: 'LoginEmptyLayout',
+//         component: EmptyLayout,
+
+//         children: [
+//             {
+//                 path: '/login',
+//                 name: 'LoginPage',
+//                 component: LoginPage,
+//                 meta: { requiresAuth: false },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'RegisterEmptyLayout',
+//         component: EmptyLayout,
+
+//         children: [
+//             {
+//                 path: '/register',
+//                 name: 'RegisterPage',
+//                 component: RegisterPage,
+//                 meta: { requiresAuth: false },
+//             },
+//         ],
+//     },
+//     {
+//         path: '/',
+//         name: 'HistoryEmptyLayout',
+//         component: EmptyLayout,
+//         children: [
+//             {
+//                 path: '/history',
+//                 name: 'OrderHistoryPage',
+//                 component: OrderHistoryPage,
+//                 meta: { requiresAuth: true },
+//             },
+//         ],
+//     },
+// ];
+
+export const routesName = {
+    HomePage: 'HomePage',
+    CategoryPage: 'CategoryPage',
+    CartPage: 'CartPage',
+    UserPage: 'UserPage',
+    QrPage: 'QrPage',
+    CreateAccount: 'CreateAccount',
+    ProductDetailPage: 'ProductDetailPage',
+    DiningTablePage: 'DiningTablePage',
+    FoodPage: 'FoodPage',
+    CreateFoodPage: 'CreateFoodPage',
+    LoginPage: 'LoginPage',
+    RegisterPage: 'RegisterPage',
+    OrderHistoryPage: 'OrderHistoryPage',
+};
+
+const shopName = store.getters['shopName'];
+const pathRoot = `/${shopName}`;
 const routes: RouteRecordRaw[] = [
     {
-        path: '/',
-        name: 'DefaultLayout',
-        component: DefaultLayout,
-        children: [
-            {
-                path: '/:slug',
-                name: 'HomePage',
-                component: HomePage,
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'CategoryDefaultLayout',
-        component: DefaultLayout,
-        children: [
-            {
-                path: '/category/:slug',
-                name: 'CategoryPage',
-                component: CategoryPage,
-                meta: { requiresAuth: true },
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'CartEmptyLayout',
-        component: EmptyLayout,
-        children: [
-            {
-                path: '/cart',
-                name: 'CartPage',
-                component: CartPage,
-                meta: { requiresAuth: false },
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'OnlyFooterLayout',
-        component: OnlyFooterLayout,
-        children: [
-            {
-                path: '/user',
-                name: 'UserPage',
-                component: UserPage,
-                meta: { requiresAuth: true },
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'QrOnlyFooterLayout',
-        component: OnlyFooterLayout,
-        children: [
-            {
-                path: '/qr',
-                name: 'QrPage',
-                component: QrPage,
-                meta: { requiresAuth: true },
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'AccountOnlyFooterLayout',
-        component: OnlyFooterLayout,
-        children: [
-            {
-                path: '/account',
-                name: 'CreateAccount',
-                component: CreateAccount,
-                meta: { requiresAuth: true },
-            },
-        ],
-    },
-
-    {
-        path: '/',
-        name: 'EmptyLayout',
-        component: EmptyLayout,
-
-        children: [
-            {
-                path: 'detail',
-                name: 'ProductDetailPage',
-                component: ProductDetailPage,
-                meta: { requiresAuth: false },
-            },
-        ],
-    },
-    {
-        path: '/',
-        name: 'TableEmptyLayout',
-        component: EmptyLayout,
-        children: [
-            {
-                path: '/table',
-                name: 'DiningTablePage',
-                component: DiningTablePage,
-                meta: { requiresAuth: true },
-            },
-        ],
-    },
-    {
-        path: '/food',
-        name: 'FoodEmptyLayout',
-        component: EmptyLayout,
+        path: pathRoot,
+        name: 'Root',
         children: [
             {
                 path: '',
-                name: 'FoodPage',
-                component: FoodPage,
-                meta: { requiresAuth: true },
+                name: 'DefaultLayout',
+                component: DefaultLayout,
+                children: [
+                    {
+                        path: '',
+                        name: routesName.HomePage,
+                        component: HomePage,
+                    },
+                ],
             },
             {
-                path: 'create',
-                name: 'CreateFoodPage',
-                component: CreateFoodPage,
-                meta: { requiresAuth: true },
+                path: '',
+                name: 'CategoryDefaultLayout',
+                component: DefaultLayout,
+                children: [
+                    {
+                        path: `category/:slug`,
+                        name: routesName.CategoryPage,
+                        component: CategoryPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
             },
-        ],
-    },
+            {
+                path: '',
+                name: 'CartEmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'cart',
+                        name: routesName.CartPage,
+                        component: CartPage,
+                        meta: { requiresAuth: false },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'OnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'user',
+                        name: routesName.UserPage,
+                        component: UserPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'QrOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'qr',
+                        name: routesName.QrPage,
+                        component: QrPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'AccountOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'account',
+                        name: routesName.CreateAccount,
+                        component: CreateAccount,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'EmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'detail',
+                        name: routesName.ProductDetailPage,
+                        component: ProductDetailPage,
+                        meta: { requiresAuth: false },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'TableEmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'table',
+                        name: routesName.DiningTablePage,
+                        component: DiningTablePage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'FoodEmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'food',
+                        name: routesName.FoodPage,
+                        component: FoodPage,
+                        meta: { requiresAuth: true },
+                    },
+                    {
+                        path: 'create',
+                        name: routesName.CreateFoodPage,
+                        component: CreateFoodPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
 
-    {
-        path: '/',
-        name: 'LoginEmptyLayout',
-        component: EmptyLayout,
+            {
+                path: '',
+                name: 'LoginEmptyLayout',
+                component: EmptyLayout,
 
-        children: [
-            {
-                path: '/login',
-                name: 'LoginPage',
-                component: LoginPage,
-                meta: { requiresAuth: false },
+                children: [
+                    {
+                        path: 'login',
+                        name: routesName.LoginPage,
+                        component: LoginPage,
+                        meta: { requiresAuth: false },
+                    },
+                ],
             },
-        ],
-    },
-    {
-        path: '/',
-        name: 'RegisterEmptyLayout',
-        component: EmptyLayout,
+            {
+                path: '',
+                name: 'RegisterEmptyLayout',
+                component: EmptyLayout,
 
-        children: [
-            {
-                path: '/register',
-                name: 'RegisterPage',
-                component: RegisterPage,
-                meta: { requiresAuth: false },
+                children: [
+                    {
+                        path: 'register',
+                        name: routesName.RegisterPage,
+                        component: RegisterPage,
+                        meta: { requiresAuth: false },
+                    },
+                ],
             },
-        ],
-    },
-    {
-        path: '/',
-        name: 'HistoryEmptyLayout',
-        component: EmptyLayout,
-        children: [
             {
-                path: '/history',
-                name: 'OrderHistoryPage',
-                component: OrderHistoryPage,
-                meta: { requiresAuth: true },
+                path: '',
+                name: 'HistoryEmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'history',
+                        name: routesName.OrderHistoryPage,
+                        component: OrderHistoryPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
             },
         ],
     },

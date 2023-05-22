@@ -12,8 +12,10 @@ import ChervonRightIcon from '../components/Icons/ChervonRightIcon.vue';
 import * as invoiceService from '../services/invoice.service';
 import * as dashboardService from '../services/dashboard.service';
 import { formatMoneyStr } from '../utils/format';
+import { routesName } from '../router';
 
 const store = useStore();
+const shopName = store.getters['shopName'];
 const purchasedProduct = ref<IProduct[]>();
 const dashboardData = ref<IDashboardData>({
     tableCount: 0,
@@ -21,7 +23,11 @@ const dashboardData = ref<IDashboardData>({
     invoiceCount: 0,
     totalMoney: 0,
 });
+
 onMounted(async () => {
+    setTimeout(() => {
+        console.log(store.getters['shopName']);
+    }, 2000);
     try {
         const result = await invoiceService.getByUser(store.getters['user']._id);
 
@@ -48,26 +54,26 @@ onMounted(async () => {
 
             <div class="feature__wrapper">
                 <div class="feature">
-                    <Button class="feature-btn" :vertical="true" :to="'/qr'">
+                    <Button class="feature-btn" :vertical="true" :to-name="routesName.QrPage">
                         <QrIcon />
                         <span class="label">QR code</span>
                     </Button>
                 </div>
                 <div class="feature">
-                    <Button class="feature-btn" :vertical="true" :to="'/table'">
+                    <Button class="feature-btn" :vertical="true" :to-name="routesName.DiningTablePage">
                         <UserNewIcon />
                         <span class="label">Tables</span>
                     </Button>
                 </div>
                 <div class="feature">
-                    <Button class="feature-btn" :vertical="true" :to="'/food'">
+                    <Button class="feature-btn" :vertical="true" :to-name="routesName.FoodPage">
                         <UserNewIcon />
                         <span class="label">Foods</span>
                     </Button>
                 </div>
 
                 <div class="feature">
-                    <Button class="feature-btn" :vertical="true" :to="'/account'">
+                    <Button class="feature-btn" :vertical="true" :to-name="routesName.CreateAccount">
                         <UserNewIcon />
                         <span class="label">Account</span>
                     </Button>
@@ -96,7 +102,7 @@ onMounted(async () => {
             </div>
 
             <div class="feature-list">
-                <Button full class="btn-flat" :to="'/history'">
+                <Button full class="btn-flat" :to-name="routesName.OrderHistoryPage">
                     <span>Đơn mua</span>
                     <ChervonRightIcon :color="`#ccc`" />
                 </Button>
