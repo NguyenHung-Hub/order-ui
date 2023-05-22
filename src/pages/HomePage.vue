@@ -9,7 +9,7 @@ let productsByCategories = ref<IProductsByCategories[]>([]);
 const isRender = ref<boolean>(false);
 
 onMounted(async () => {
-    await store.dispatch('fetchProducts');
+    await store.dispatch('fetchProducts', store.getters['shopId']);
     console.log(`file: HomePage.vue:13 > store:`, store);
     productsByCategories.value = store.getters['prodByCate'];
     if (productsByCategories.value.length > 0) {

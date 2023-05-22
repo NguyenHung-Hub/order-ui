@@ -19,9 +19,9 @@ export const getRecommend = async (): Promise<IProduct[] | undefined> => {
     }
 };
 
-export const getByCategories = async (size: number): Promise<IProduct[] | undefined> => {
+export const getByCategories = async (shopId: string, size: number): Promise<IProduct[] | undefined> => {
     try {
-        const result = await httpRequest.get(`/product/categories?size=${size}`);
+        const result = await httpRequest.get(`/product/categories?shopId=${shopId}&size=${size}`);
         return result.data.data as IProduct[];
     } catch (error) {
         console.log(`file: product.service.ts:28 > error:`, error);

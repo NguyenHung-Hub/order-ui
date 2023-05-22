@@ -2,7 +2,7 @@ import { ActionContext } from 'vuex';
 import { IProduct, IProductsByCategories } from '../../../interfaces/product.interface';
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import httpRequest from '../../../utils/httpRequest';
-
+import * as productService from '../../../services/product.service';
 interface ProductState {
     products: IProduct[] | [];
     prodByCate: IProductsByCategories[] | [];
@@ -40,10 +40,10 @@ const productStore: StoreBase = {
         },
     },
     actions: {
-        async fetchProducts(context: ActionContext<ProductState, RootState>) {
+        async fetchProducts(context: ActionContext<ProductState, RootState>, shopId: string) {
             try {
-                const result = await httpRequest.get('/product/categories');
-                context.commit('setProdByCate', result.data.data);
+                const result = await productService.getByCategories(shopId, 5);
+                context.commit('setProdByCate', result);
             } catch (error) {
                 console.log(error);
                 context.commit('setError', error);
