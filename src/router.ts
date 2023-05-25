@@ -16,6 +16,7 @@ import CreateFoodPage from './pages/CreateFoodPage.vue';
 import LoginPage from './pages/LoginPage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
 import OrderHistoryPage from './pages/OrderHistoryPage.vue';
+import WaiterPage from './pages/WaiterPage.vue';
 
 import store from './store';
 
@@ -202,13 +203,14 @@ export const routesName = {
     LoginPage: 'LoginPage',
     RegisterPage: 'RegisterPage',
     OrderHistoryPage: 'OrderHistoryPage',
+    WaiterPage: 'WaiterPage',
 };
 
 const shopName = store.getters['shopName'];
 const pathRoot = `/${shopName}`;
 const routes: RouteRecordRaw[] = [
     {
-        path: pathRoot,
+        path: '/:shop',
         name: 'Root',
         children: [
             {
@@ -219,7 +221,7 @@ const routes: RouteRecordRaw[] = [
                     {
                         path: '',
                         name: routesName.HomePage,
-                        component: HomePage,
+                        component: () => import('./pages/HomePage.vue'),
                     },
                 ],
             },
@@ -341,7 +343,7 @@ const routes: RouteRecordRaw[] = [
 
                 children: [
                     {
-                        path: 'login',
+                        path: '/login',
                         name: routesName.LoginPage,
                         component: LoginPage,
                         meta: { requiresAuth: false },
@@ -375,6 +377,19 @@ const routes: RouteRecordRaw[] = [
                     },
                 ],
             },
+            {
+                path: '',
+                name: 'WaiterOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'waiter',
+                        name: routesName.WaiterPage,
+                        component: WaiterPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
         ],
     },
 ];
@@ -387,7 +402,6 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const isAuthenticated = store.getters['isAuthenticated'];
-    console.log(`file: router.ts:179 > isAuthenticated:`, isAuthenticated);
 
     if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (isAuthenticated) {

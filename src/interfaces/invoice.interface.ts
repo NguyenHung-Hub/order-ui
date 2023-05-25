@@ -12,7 +12,11 @@ export interface IInvoice extends IInvoiceBase {
     carts: ICartItemRequest[];
 }
 
+export interface IInvoiceItem extends IProduct {
+    quantity: number;
+}
+
 export interface IInvoiceResponse extends ITimeStamps, IInvoiceBase {
     _id: string;
-    carts: IProduct[];
+    carts: IInvoiceItem[];
 }

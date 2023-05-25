@@ -4,9 +4,8 @@ import ScreenBase from '../components/ScreenBase.vue';
 import * as invoiceService from '../services/invoice.service';
 import { useStore } from 'vuex';
 import { IInvoiceResponse } from '../interfaces/invoice.interface';
-import { formatMoney, formatDate } from '../utils/format';
-import Button from '../components/Button.vue';
-import ArrowRightIcon from '../components/Icons/ArrowRightIcon.vue';
+import { formatMoney } from '../utils/format';
+import CardHorizontal from '../components/Card/CardHorizontal.vue';
 
 const invoices = ref<IInvoiceResponse[]>([]);
 const store = useStore();
@@ -14,16 +13,14 @@ onMounted(async () => {
     try {
         const result = await invoiceService.getByUser(store.getters['user']._id);
         if (result) {
-            invoices.value = result.sort((a, b) => {
-                return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
-            });
+            invoices.value = result;
         }
     } catch (error) {
         console.log(`file: OrderHistoryPage.vue:17 > error:`, error);
     }
 });
 
-function caclTotal(invoice: IInvoiceResponse) {
+function calcTotal(invoice: IInvoiceResponse) {
     const total = invoice.carts.reduce((acc, item) => acc + item.priceSale * item.quantity, 0);
 
     return formatMoney(total);
@@ -32,31 +29,7 @@ function caclTotal(invoice: IInvoiceResponse) {
 
 <template>
     <ScreenBase :title="'Lịch sử đặt món'" fullScreen>
-        <div class="order-history">
-            <div class="invoice__section" v-for="invoice in invoices" :key="invoice._id">
-                <div class="card__wrapper" v-for="item in invoice.carts" :key="item._id">
-                    <img class="product__preview" :src="item.photo" alt="" />
-                    <div class="card__info">
-                        <div class="product__name">{{ item.name }}</div>
-                        <div class="product__price">
-                            <div class="product__quantity">x{{ item.quantity }}</div>
-                            <div class="product__price--sale">{{ formatMoney(item.priceSale) }}đ</div>
-                            <div class="product__total">
-                                <span>Thành tiền:</span> {{ formatMoney(item.priceSale * item.quantity) }}đ
-                            </div>
-                        </div>
-                    </div>
-                    <Button class="detail-btn" :to="`/detail?p=${item.slug}`">
-                        <span>Xem</span>
-                        <ArrowRightIcon :color="`#ff964f`" :width="'1.1rem'" :height="'0.8rem'" />
-                    </Button>
-                </div>
-                <div class="invoice-info">
-                    <p class="invoice-date">{{ formatDate(invoice.updatedAt as string) }}</p>
-                    <p class="invoice-total"><span>Tổng tiền:</span> {{ caclTotal(invoice) }}đ</p>
-                </div>
-            </div>
-        </div>
+        <CardHorizontal :invoices="invoices" />
     </ScreenBase>
 </template>
 

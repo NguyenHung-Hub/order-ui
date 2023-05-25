@@ -1,7 +1,7 @@
 import { IInvoice, IInvoiceResponse } from '../interfaces/invoice.interface';
 import httpRequest from '../utils/httpRequest';
 
-export const create = async (invoice: IInvoice): Promise<IInvoice | undefined> => {
+export const create = async (invoice: IInvoice): Promise<IInvoiceResponse | undefined> => {
     try {
         const result = await httpRequest.post('/invoice', invoice);
         return result.data.data;
@@ -16,5 +16,14 @@ export const getByUser = async (userId: string): Promise<IInvoiceResponse[] | un
         return result.data.data;
     } catch (error) {
         console.log(`file: invoice.service.ts:18 > error:`, error);
+    }
+};
+
+export const getByShop = async (shopId: string): Promise<IInvoiceResponse[] | undefined> => {
+    try {
+        const result = await httpRequest.get(`/invoice?shopId=${shopId}`);
+        return result.data.data;
+    } catch (error) {
+        console.log(`file: invoice.service.ts:17 > error:`, error);
     }
 };

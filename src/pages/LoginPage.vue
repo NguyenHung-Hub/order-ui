@@ -5,6 +5,9 @@ import * as authService from '../services/auth.service';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { routesName } from '../router';
+import { joinRoomShopWaiter } from '../socket/waiter.socket';
+import roleName from '../config/roleName';
 
 const store = useStore();
 const router = useRouter();
@@ -23,11 +26,16 @@ function setPassword(value: string) {
 async function handleLogin() {
     try {
         if (email.value.trim() != '' && password.value.trim() != '') {
-            console.log(`file: LoginPage.vue:22 > email.value, password.value:`, email.value, password.value);
             const result = await authService.login(email.value, password.value);
-            console.log(`file: LoginPage.vue:14 > result:`, result);
-            await store.dispatch('setUser', result);
-            router.push('/');
+
+            if (result) {
+                if (result.role.name == roleName.WAITER) {
+                    joinRoomShopWaiter(`${result.shop._id}_${roleName.WAITER}`);
+                }
+
+                await store.dispatch('setUser', result);
+                router.push({ path: `/${result?.shop.name}` });
+            }
         }
     } catch (error) {
         console.log(`file: LoginPage.vue:17 > error:`, error);

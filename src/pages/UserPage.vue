@@ -25,9 +25,6 @@ const dashboardData = ref<IDashboardData>({
 });
 
 onMounted(async () => {
-    setTimeout(() => {
-        console.log(store.getters['shopName']);
-    }, 2000);
     try {
         const result = await invoiceService.getByUser(store.getters['user']._id);
 

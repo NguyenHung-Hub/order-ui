@@ -9,16 +9,11 @@ import HomeDisableIcon from './Icons/HomeDisableIcon.vue';
 import CartDisableIcon from './Icons/CartDisableIcon.vue';
 import UserDisableIcon from './Icons/UserDisableIcon.vue';
 import { useStore } from 'vuex';
+import roleName from '../config/roleName';
 
 const store = useStore();
 const shopName = store.getters['shopName'];
 const countCart = ref<number>(0);
-const roleName = {
-    MANAGER: 'manager',
-    STAFF: 'staff',
-    CHEF: 'chef',
-    CUSTOMER: 'customer',
-};
 
 watchEffect(() => {
     countCart.value = store.getters['countCartItem'];
@@ -47,6 +42,18 @@ watchEffect(() => {
                     </Button>
                 </RouterLink>
             </div>
+
+            <div class="nav-item" v-if="store.getters['userRole'] == roleName.WAITER">
+                <RouterLink :to="{ name: 'WaiterPage' }" v-slot="{ isActive }">
+                    <Button class="nav-btn nav-cart" vertical>
+                        <CartIcon class="nav-icon" v-if="isActive" />
+                        <CartDisableIcon class="nav-icon" v-else />
+                        <span class="nav-text" :class="{ disable: !isActive }">Đơn đặt</span>
+                        <p class="cart-count" v-if="countCart > 0">{{ countCart }}</p>
+                    </Button>
+                </RouterLink>
+            </div>
+
             <div class="nav-item">
                 <RouterLink :to="{ name: 'UserPage' }" v-slot="{ isActive }">
                     <Button class="nav-btn" vertical>

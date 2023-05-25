@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { useStore } from 'vuex';
-import { watchEffect, ref, onMounted, reactive } from 'vue';
+import { ref, onMounted } from 'vue';
 import ProductSection from '../components/ProductSection.vue';
 import { IProductsByCategories } from '../interfaces/product.interface';
+import { useRoute } from 'vue-router';
 
 const store = useStore();
+const route = useRoute();
+
 let productsByCategories = ref<IProductsByCategories[]>([]);
 const isRender = ref<boolean>(false);
 
 onMounted(async () => {
-    await store.dispatch('fetchProducts', store.getters['shopId']);
-    console.log(`file: HomePage.vue:13 > store:`, store);
+    const shopName = route.params.shop;
+
+    await store.dispatch('fetchProducts', shopName);
     productsByCategories.value = store.getters['prodByCate'];
-    if (productsByCategories.value.length > 0) {
+    if (productsByCategories.value?.length > 0) {
         isRender.value = true;
     } else {
         isRender.value = false;

@@ -28,7 +28,6 @@ const productStore: StoreBase = {
 
         setProdByCate(state: ProductState, prodByCatePayload: IProductsByCategories[]) {
             state.prodByCate = prodByCatePayload;
-            console.log(state);
         },
 
         addProdByCate(state: ProductState, prodByCatePayload: IProductsByCategories) {
@@ -40,9 +39,9 @@ const productStore: StoreBase = {
         },
     },
     actions: {
-        async fetchProducts(context: ActionContext<ProductState, RootState>, shopId: string) {
+        async fetchProducts(context: ActionContext<ProductState, RootState>, shopName: string) {
             try {
-                const result = await productService.getByCategories(shopId, 5);
+                const result = await productService.getByCategories(shopName, 5);
                 context.commit('setProdByCate', result);
             } catch (error) {
                 console.log(error);

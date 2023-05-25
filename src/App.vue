@@ -1,7 +1,18 @@
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
-import HeaderMobile from "./components/HeaderMobile.vue";
-import Footer from "./components/Footer.vue";
+import { onMounted } from 'vue';
+import { joinRoomShopWaiter, onGetOrderFromCustomer } from './socket/waiter.socket';
+import { useStore } from 'vuex';
+import roleName from './config/roleName';
+
+const store = useStore();
+
+onMounted(() => {
+    onGetOrderFromCustomer();
+
+    if (store.getters['userRole'] != roleName.CUSTOMER) {
+        joinRoomShopWaiter(store.getters['shopId']);
+    }
+});
 </script>
 
 <template>
@@ -11,7 +22,7 @@ import Footer from "./components/Footer.vue";
 </template>
 
 <style scoped lang="scss">
-@use "./styles/index" as *;
+@use './styles/index' as *;
 
 .main-wrapper {
     position: relative;

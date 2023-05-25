@@ -10,6 +10,8 @@ import { formatMoney } from '../utils/format';
 import * as invoiceService from '../services/invoice.service';
 import { IInvoice } from '../interfaces/invoice.interface';
 import ModalLoading from '../components/Modal/ModalLoading.vue';
+import { emitInvoiceToWaiter } from '../socket/waiter.socket';
+import { IUserResponse } from '../interfaces/auth.interface';
 
 const cartItems = ref<ICartItem[]>([]);
 const countCart = ref<string>('');
@@ -54,16 +56,24 @@ async function handleOrder() {
         );
 
         try {
+            const customer: IUserResponse = store.getters['user'];
+
             const newInvoice: IInvoice = {
-                shopId: store.getters['user'].shopId,
-                customerId: store.getters['user']._id,
+                shopId: customer.shop._id,
+                customerId: customer._id,
+                customerName: customer.fullName,
+                customerPhone: customer.phone,
                 carts: cartItemRequest,
             };
+
             const result = await invoiceService.create(newInvoice);
-            status.value = 'success';
-            await store.dispatch('clearCart');
-            cartItems.value = [];
-            console.log(`file: CartPage.vue:48 > result:`, result);
+            if (result) {
+                status.value = 'success';
+                await store.dispatch('clearCart');
+                cartItems.value = [];
+                console.log(`file: CartPage.vue:48 > result:`, result);
+                emitInvoiceToWaiter(result);
+            }
         } catch (error) {
             status.value = 'error';
             console.log(`file: CartPage.vue:50 > error:`, error);

@@ -15,7 +15,6 @@ const authStore: StoreBase = {
         let isAuth = false;
         if (localStorage.getItem('user')) {
             userLocal = JSON.parse(localStorage.getItem('user') as string) as IUserResponse;
-            console.log(`file: auth.ts:17 > userLocal:`, userLocal);
             isAuth = true;
         } else {
             userLocal = null;
