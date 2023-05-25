@@ -4,6 +4,7 @@ import { useStore } from 'vuex';
 import { IInvoiceResponse } from '../interfaces/invoice.interface';
 import { formatDate } from '../utils/format';
 import CardHorizontal from '../components/Card/CardHorizontal.vue';
+import TabBase from '../components/Tab/TabBase.vue';
 
 const store = useStore();
 const invoicesFromCustomer = ref<IInvoiceResponse[]>([]);
@@ -20,9 +21,16 @@ watchEffect(() => {
 
 <template>
     <div class="waiter-page__wrapper">
-        <div class="scroll-container">
-            <CardHorizontal :invoices="invoicesFromCustomer" show-info />
-        </div>
+        <TabBase :tab-names="['Mới', 'Chờ món', 'Phục vụ', 'Đã xong']">
+            <template v-slot:tabPanel-1>
+                <div class="scroll-container">
+                    <CardHorizontal :invoices="invoicesFromCustomer" show-info />
+                </div>
+            </template>
+            <template v-slot:tabPanel-2>tab 2</template>
+            <template v-slot:tabPanel-3>tab 3</template>
+            <template v-slot:tabPanel-4>tab 4</template>
+        </TabBase>
     </div>
 </template>
 
