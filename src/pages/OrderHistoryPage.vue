@@ -19,12 +19,6 @@ onMounted(async () => {
         console.log(`file: OrderHistoryPage.vue:17 > error:`, error);
     }
 });
-
-function calcTotal(invoice: IInvoiceResponse) {
-    const total = invoice.carts.reduce((acc, item) => acc + item.priceSale * item.quantity, 0);
-
-    return formatMoney(total);
-}
 </script>
 
 <template>

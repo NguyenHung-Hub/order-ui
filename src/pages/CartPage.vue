@@ -8,7 +8,7 @@ import { ICartItem, ICartItemRequest } from '../interfaces/cart.interface';
 import { useStore } from 'vuex';
 import { formatMoney } from '../utils/format';
 import * as invoiceService from '../services/invoice.service';
-import { IInvoice } from '../interfaces/invoice.interface';
+import { IInvoice, IInvoiceItem } from '../interfaces/invoice.interface';
 import ModalLoading from '../components/Modal/ModalLoading.vue';
 import { emitInvoiceToWaiter } from '../socket/waiter.socket';
 import { IUserResponse } from '../interfaces/auth.interface';
@@ -48,10 +48,10 @@ async function handleOrder() {
 
     if (cartItems.value.length > 0) {
         const cartItemRequest = cartItems.value.map(
-            (item): ICartItemRequest => ({
+            (item): IInvoiceItem => ({
                 productId: item.product._id as string,
-                price: item.product.priceSale,
                 quantity: item.quantity,
+                status: 'waitingFood',
             }),
         );
 
@@ -63,15 +63,16 @@ async function handleOrder() {
                 customerId: customer._id,
                 customerName: customer.fullName,
                 customerPhone: customer.phone,
-                carts: cartItemRequest,
+                items: cartItemRequest,
+                status: 'waitingConfirm',
             };
 
             const result = await invoiceService.create(newInvoice);
+
             if (result) {
                 status.value = 'success';
                 await store.dispatch('clearCart');
                 cartItems.value = [];
-                console.log(`file: CartPage.vue:48 > result:`, result);
                 emitInvoiceToWaiter(result);
             }
         } catch (error) {

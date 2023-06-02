@@ -193,6 +193,4 @@ function toggleModalTable() {
 
     margin: 8px 0;
 }
-.dining-table__body {
-}
 </style>

@@ -15,15 +15,17 @@ const store = useStore();
 const shopName = store.getters['shopName'];
 const countCart = ref<number>(0);
 
+const role = ref<string>('');
 watchEffect(() => {
     countCart.value = store.getters['countCartItem'];
+    role.value = store.getters['userRole'];
 });
 </script>
 
 <template>
     <div class="footer-wrapper">
         <div class="nav-footer">
-            <div class="nav-item" v-if="store.getters['userRole'] == roleName.CUSTOMER">
+            <div class="nav-item" v-if="role == roleName.CUSTOMER">
                 <RouterLink active-class="link-active" :to="{ name: 'HomePage' }" v-slot="{ isActive }">
                     <Button class="nav-btn" vertical>
                         <HomeIcon class="nav-icon" v-if="isActive" />
@@ -32,7 +34,7 @@ watchEffect(() => {
                     </Button>
                 </RouterLink>
             </div>
-            <div class="nav-item" v-if="store.getters['userRole'] == roleName.CUSTOMER">
+            <div class="nav-item" v-if="role == roleName.CUSTOMER">
                 <RouterLink :to="{ name: 'CartPage' }" v-slot="{ isActive }">
                     <Button class="nav-btn nav-cart" vertical>
                         <CartIcon class="nav-icon" v-if="isActive" />
@@ -43,7 +45,7 @@ watchEffect(() => {
                 </RouterLink>
             </div>
 
-            <div class="nav-item" v-if="store.getters['userRole'] == roleName.WAITER">
+            <div class="nav-item" v-if="role == roleName.WAITER || role == roleName.CHEF">
                 <RouterLink :to="{ name: 'WaiterPage' }" v-slot="{ isActive }">
                     <Button class="nav-btn nav-cart" vertical>
                         <CartIcon class="nav-icon" v-if="isActive" />

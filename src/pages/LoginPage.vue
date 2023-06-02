@@ -29,12 +29,16 @@ async function handleLogin() {
             const result = await authService.login(email.value, password.value);
 
             if (result) {
+                await store.dispatch('setUser', result);
+
                 if (result.role.name == roleName.WAITER) {
                     joinRoomShopWaiter(`${result.shop._id}_${roleName.WAITER}`);
+                    router.push({ path: `/${result?.shop.name}/waiter` });
+                } else if (result.role.name == roleName.CHEF) {
+                    router.push({ path: `/${result?.shop.name}/chef` });
+                } else {
+                    router.push({ path: `/${result?.shop.name}` });
                 }
-
-                await store.dispatch('setUser', result);
-                router.push({ path: `/${result?.shop.name}` });
             }
         }
     } catch (error) {

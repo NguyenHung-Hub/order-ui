@@ -17,6 +17,7 @@ import LoginPage from './pages/LoginPage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
 import OrderHistoryPage from './pages/OrderHistoryPage.vue';
 import WaiterPage from './pages/WaiterPage.vue';
+import ChefPage from './pages/ChefPage.vue';
 
 import store from './store';
 
@@ -204,6 +205,7 @@ export const routesName = {
     RegisterPage: 'RegisterPage',
     OrderHistoryPage: 'OrderHistoryPage',
     WaiterPage: 'WaiterPage',
+    ChefPage: 'ChefPage',
 };
 
 const shopName = store.getters['shopName'];
@@ -386,6 +388,19 @@ const routes: RouteRecordRaw[] = [
                         path: 'waiter',
                         name: routesName.WaiterPage,
                         component: WaiterPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'ChefOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'chef',
+                        name: routesName.ChefPage,
+                        component: ChefPage,
                         meta: { requiresAuth: true },
                     },
                 ],

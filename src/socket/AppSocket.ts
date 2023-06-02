@@ -15,9 +15,11 @@ class AppSocket {
             AppSocket.manager = new Manager(AppSocket.baseUrl);
         }
 
-        if (!AppSocket.socket) {
-            AppSocket.socket = AppSocket.manager.socket(`/${namespace}`);
-        }
+        console.log(AppSocket.manager);
+
+        AppSocket.socket = AppSocket.manager.socket(`/${namespace}`);
+        // if (!AppSocket.socket) {
+        // }
         console.log(`file: AppSocket.ts:21 > AppSocket.socket:`, AppSocket.socket);
 
         return AppSocket.socket;

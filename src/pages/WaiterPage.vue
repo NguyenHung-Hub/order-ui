@@ -1,35 +1,37 @@
 <script setup lang="ts">
 import { ref, watchEffect, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { IInvoiceResponse } from '../interfaces/invoice.interface';
+import { IInvoiceResponse, IInvoiceStatus } from '../interfaces/invoice.interface';
 import { formatDate } from '../utils/format';
 import CardHorizontal from '../components/Card/CardHorizontal.vue';
 import TabBase from '../components/Tab/TabBase.vue';
 
 const store = useStore();
-const invoicesFromCustomer = ref<IInvoiceResponse[]>([]);
+const invoiceStatus = ref<IInvoiceStatus>();
 
 onMounted(async () => {
-    await store.dispatch('fetchOrders', store.getters['shopId']);
+    await store.dispatch('fetchInvoices', store.getters['shopId']);
 });
 
 watchEffect(() => {
-    invoicesFromCustomer.value = store.getters['orders'];
-    console.log(`file: WaiterPage.vue:11 > invoicesFromCustomer.value:`, invoicesFromCustomer.value);
+    invoiceStatus.value = store.getters['invoices'];
 });
 </script>
 
 <template>
     <div class="waiter-page__wrapper">
-        <TabBase :tab-names="['Mới', 'Chờ món', 'Phục vụ', 'Đã xong']">
+        <TabBase :tab-names="['Mới', 'Phục vụ', 'Đã xong']">
             <template v-slot:tabPanel-1>
                 <div class="scroll-container">
-                    <CardHorizontal :invoices="invoicesFromCustomer" show-info />
+                    <CardHorizontal :invoices="invoiceStatus?.waitingConfirm" show-info />
                 </div>
             </template>
-            <template v-slot:tabPanel-2>tab 2</template>
+            <template v-slot:tabPanel-2>
+                <div class="scroll-container">
+                    <CardHorizontal :invoices="invoiceStatus?.serving" show-info />
+                </div>
+            </template>
             <template v-slot:tabPanel-3>tab 3</template>
-            <template v-slot:tabPanel-4>tab 4</template>
         </TabBase>
     </div>
 </template>

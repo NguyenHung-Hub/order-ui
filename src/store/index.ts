@@ -4,7 +4,7 @@ import productStore from './module/product/product';
 import categoryStore from './module/category/category';
 import areaStore from './module/area/area';
 import cartStore from './module/cart/cart';
-import ordersStore from './module/orders/orders';
+import invoiceStore from './module/invoice/invoice';
 
 const store = createStore({
     modules: {
@@ -13,7 +13,7 @@ const store = createStore({
         category: categoryStore,
         area: areaStore,
         cart: cartStore,
-        orders: ordersStore,
+        invoice: invoiceStore,
     },
 });
 

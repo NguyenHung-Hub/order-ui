@@ -1,60 +1,131 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IInvoiceResponse } from '../../interfaces/invoice.interface';
+import { ref, watchEffect } from 'vue';
+import { IInvoice, IInvoiceResponse } from '../../interfaces/invoice.interface';
+import { UpdateInvoiceDto } from '../../dtos/invoice.dto';
 import { formatDate, formatMoney } from '../../utils/format';
 import Button from '../../components/Button.vue';
 import ArrowRightIcon from '../../components/Icons/ArrowRightIcon.vue';
+import ModalConfirm from '../Modal/ModalConfirm.vue';
+import * as invoiceService from '../../services/invoice.service';
+import { calcTotal } from '../../utils/calcInvoices';
+import { useStore } from 'vuex';
+import { IMoveInvoiceData } from '../../store/module/invoice/invoice';
+import { TRoleName } from '../../interfaces/auth.interface';
+import DotHorizontal from '../Loading/DotHorizontal.vue';
+import LabelLoading from '../Loading/LabelLoading.vue';
+import { emitInvoiceToChef } from '../../socket/chef.socket';
 
 interface Props {
     invoices: IInvoiceResponse[];
     showInfo?: boolean;
 }
+const store = useStore();
 
 const props = withDefaults(defineProps<Props>(), {
     showInfo: false,
 });
-console.log(`file: CardHorizontal.vue:13 > props:`, props);
+const isShowModal = ref(false);
+const isCustomer = ref(false);
+const isWaiter = ref(false);
+const invoiceIdOnClick = ref('');
 
-function calcTotal(invoice: IInvoiceResponse) {
-    const total = invoice.carts.reduce((acc, item) => acc + item.priceSale * item.quantity, 0);
-    return formatMoney(total);
+watchEffect(() => {
+    const role: TRoleName = store.getters['userRole'];
+    switch (role) {
+        case 'customer':
+            isCustomer.value = true;
+            break;
+        case 'waiter':
+            isWaiter.value = true;
+            break;
+
+        default:
+            break;
+    }
+});
+
+function showModal(invoiceId: string) {
+    isShowModal.value = true;
+    invoiceIdOnClick.value = invoiceId;
+}
+
+/**
+ * update field status:'serving'
+ */
+async function confirmUpdateInvoice() {
+    isShowModal.value = false;
+    console.log(invoiceIdOnClick.value);
+
+    const findInvoice = props.invoices.filter((i) => i._id === invoiceIdOnClick.value);
+    const updateInvoice: IInvoice = new UpdateInvoiceDto({ ...findInvoice[0], status: 'serving' });
+    const result = await invoiceService.update(updateInvoice);
+
+    if (result) {
+        const dataMoveInvoice: IMoveInvoiceData = { invoice: result, from: 'waitingConfirm', to: 'serving' };
+        await store.dispatch('moveInvoice', dataMoveInvoice);
+        emitInvoiceToChef(result);
+    }
 }
 </script>
 
 <template>
     <div class="card-list__wrapper">
         <div class="card__section" v-for="invoice in props.invoices" :key="invoice._id">
-            <div class="card__body" v-for="item in invoice.carts" :key="item._id">
-                <img class="product__preview" :src="item.photo" alt="" />
+            <div class="card__body" v-for="(item, index) in invoice.items" :key="index">
+                <img class="product__preview" :src="item.product.photo" alt="" />
                 <div class="card__info">
-                    <div class="product__name">{{ item.name }}</div>
+                    <div class="product__name">{{ item.product.name }}</div>
                     <div class="product__price">
                         <div class="product__quantity">x{{ item.quantity }}</div>
-                        <div class="product__price--sale">{{ formatMoney(item.priceSale) }}đ</div>
+                        <div class="product__price--sale">{{ formatMoney(item.product.priceSale) }}đ</div>
                         <div class="product__total">
-                            <span>Thành tiền:</span> {{ formatMoney(item.priceSale * item.quantity) }}đ
+                            <span>Thành tiền:</span> {{ formatMoney(item.product.priceSale * item.quantity) }}đ
                         </div>
                     </div>
                 </div>
-                <Button class="detail-btn" :to="`/detail?p=${item.slug}`">
+                <Button class="btn-right" :to="`/detail?p=${item.product.slug}`" v-if="isCustomer">
                     <span>Xem</span>
                     <ArrowRightIcon :color="`#ff964f`" :width="'1.1rem'" :height="'0.8rem'" />
                 </Button>
+
+                <div v-if="isWaiter">
+                    <LabelLoading
+                        class="btn-right"
+                        :label="'Chờ món'"
+                        v-if="invoice.status === 'serving' && item.status === 'waitingFood'"
+                    />
+                    <Button class="btn-right" success v-if="item.status === 'finishFood'"> Giao món </Button>
+                    <Button class="btn-right" outline v-if="item.status === 'waitingFood'"> Đã giao </Button>
+                </div>
             </div>
             <div class="card-footer">
                 <div class="info__wrapper" v-if="showInfo">
                     <p class="info-label">Khách: {{ invoice.customerName }}</p>
                     <p class="info-label">{{ invoice.customerPhone }}</p>
+                    <p>{{ invoice.items.length }} / {{ invoice.items.length }} Đã giao</p>
                 </div>
                 <div class="info__wrapper">
                     <p class="info-label">{{ formatDate(invoice.updatedAt as string) }}</p>
                     <p class="info-label"><span>Tổng tiền:</span> {{ calcTotal(invoice) }}đ</p>
 
-                    <Button success>Nhận đơn</Button>
+                    <div v-if="isWaiter">
+                        <Button
+                            success
+                            :click="() => showModal(invoice._id)"
+                            v-if="invoice.status === 'waitingConfirm'"
+                        >
+                            Nhận đơn
+                        </Button>
+                        <Button primary v-if="invoice.status === 'serving'">Xác nhận thanh toán</Button>
+
+                        <Button outline v-if="invoice.status === 'finish'">Xong</Button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <ModalConfirm :msg="'Nhận đơn???'" @okay="confirmUpdateInvoice" v-if="isShowModal" />
 </template>
 
 <style scoped lang="scss">
@@ -126,12 +197,12 @@ function calcTotal(invoice: IInvoiceResponse) {
                     }
                 }
             }
-            .detail-btn {
+            .btn-right {
                 position: absolute;
                 right: 4px;
                 bottom: 4px;
                 margin: 0;
-                padding: 8px;
+                // padding: 8px;
 
                 color: #ff964f;
 
@@ -182,14 +253,14 @@ function calcTotal(invoice: IInvoiceResponse) {
 
 @keyframes slideLeftToRight {
     0% {
-        transform: translateY(-100%);
-        scale: 0.8;
+        transform: translateY(-5%);
+        scale: 0.95;
         opacity: 0;
         height: 0;
         overflow: hidden;
     }
     70% {
-        scale: 1.1;
+        scale: 1.01;
     }
     100% {
         transform: translateY(0);
