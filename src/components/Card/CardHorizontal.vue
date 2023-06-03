@@ -95,14 +95,14 @@ async function confirmUpdateInvoice() {
                         v-if="invoice.status === 'serving' && item.status === 'waitingFood'"
                     />
                     <Button class="btn-right" success v-if="item.status === 'finishFood'"> Giao món </Button>
-                    <Button class="btn-right" outline v-if="item.status === 'waitingFood'"> Đã giao </Button>
+                    <Button class="btn-right" outline v-if="item.status === 'finish'"> Đã giao </Button>
                 </div>
             </div>
             <div class="card-footer">
                 <div class="info__wrapper" v-if="showInfo">
                     <p class="info-label">Khách: {{ invoice.customerName }}</p>
                     <p class="info-label">{{ invoice.customerPhone }}</p>
-                    <p>{{ invoice.items.length }} / {{ invoice.items.length }} Đã giao</p>
+                    <p>0 / {{ invoice.items.length }} Đã giao</p>
                 </div>
                 <div class="info__wrapper">
                     <p class="info-label">{{ formatDate(invoice.updatedAt as string) }}</p>

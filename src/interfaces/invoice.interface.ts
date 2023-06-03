@@ -17,6 +17,7 @@ export interface IInvoiceItem extends IInvoiceItemBase {
 export interface IInvoiceItemResponse extends IInvoiceItemBase {
     product: IProduct;
 }
+
 interface IInvoiceBase {
     shopId: string;
     customerId?: string;
@@ -39,4 +40,20 @@ export interface IInvoiceStatus {
     serving: Array<IInvoiceResponse> | [];
     finish: Array<IInvoiceResponse> | [];
     cancel: Array<IInvoiceResponse> | [];
+}
+
+export interface IInvoiceItemGroup extends IInvoiceItemResponse {
+    invoiceId: string;
+}
+export interface IInvoiceItemGroup2 extends IInvoiceItemResponse {
+    invoiceId: string[];
+}
+
+export interface IInvoiceGroup extends ITimeStamps {
+    shopId: string;
+    group: IInvoiceItemGroup[];
+}
+export interface IInvoiceGroup2 extends ITimeStamps {
+    shopId: string;
+    group: IInvoiceItemGroup2[];
 }

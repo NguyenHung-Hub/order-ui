@@ -39,7 +39,7 @@ const productStore: StoreBase = {
             console.log(`file: invoice.ts:39 > invoicesPayload:`, invoicesPayload);
         },
         addInvoiceServing(state: InvoicesState, invoicePayload: IInvoiceResponse) {
-            state.invoices.serving = [invoicePayload, ...state.invoices.serving];
+            state.invoices.serving = [...state.invoices.serving, invoicePayload];
         },
 
         setInvoicesFinish(state: InvoicesState, invoicesPayload: IInvoiceResponse[]) {

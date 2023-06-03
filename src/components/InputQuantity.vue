@@ -11,13 +11,12 @@ interface Props {
     max?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), { size: 20, value: 1, min: 1, max: 20 });
+const props = withDefaults(defineProps<Props>(), { size: 20, value: 0, min: 1, max: 20 });
 const emit = defineEmits<{ (event: 'onChange', value: number): void }>();
 
 const sizeInput = computed(() => `${props.size}px`);
-const quantity = ref<number>(props.value);
+const quantity = ref<number>(props.value || props.min);
 const input = ref<HTMLInputElement>();
-console.log(props.value);
 
 function setIncrease() {
     quantity.value += 1;

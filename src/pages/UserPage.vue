@@ -30,7 +30,11 @@ onMounted(async () => {
 
         if (result) {
             purchasedProduct.value = result.reduce((acc: IProduct[], curr) => {
-                return [...acc, ...curr.carts];
+                const products = curr.items.reduce(
+                    (acc2: IProduct[], curr2) => [...acc2, curr2.product],
+                    [] as IProduct[],
+                );
+                return [...acc, ...products];
             }, []);
         }
 

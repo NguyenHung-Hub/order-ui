@@ -1,35 +1,126 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watchEffect, onBeforeMount, reactive, watch, toRaw } from 'vue';
 import { useStore } from 'vuex';
-import { IInvoiceItemResponse, IInvoiceStatus } from '../interfaces/invoice.interface';
+import {
+    IInvoiceGroup,
+    IInvoiceGroup2,
+    IInvoiceItemGroup2,
+    IInvoiceResponse,
+    IInvoiceStatus,
+} from '../interfaces/invoice.interface';
 import ChefView from '../components/ChefView.vue';
 import { cloneDeep } from 'lodash';
 let invoiceStatus = reactive<IInvoiceStatus>({ waitingConfirm: [], serving: [], finish: [], cancel: [] });
-let invoicesServing = reactive<IInvoiceItemResponse[]>([]);
+let invoicesItemGroup = reactive<IInvoiceGroup2[]>([]);
 
 const store = useStore();
+const MINUTES_GROUP = 5;
 
 const handleMap = (invoiceStatus: IInvoiceStatus) => {
     if (invoiceStatus) {
         const invoiceStatusCopy = cloneDeep(invoiceStatus);
+        console.log(`file: C hefPage.vue:22 > invoiceStatusCopy:`, invoiceStatusCopy);
 
-        const invoiceItemsTemp = invoiceStatusCopy.serving.reduce((acc, curr) => {
-            return [...acc, ...curr.items];
-        }, [] as IInvoiceItemResponse[]);
-
-        const invoiceItems: IInvoiceItemResponse[] = [];
-        invoiceItemsTemp?.forEach((invoice, index) => {
-            const findIndex = invoiceItems.findIndex((item) => item.product._id === invoice.product._id);
-
-            if (findIndex < 0) {
-                invoiceItems.push(invoice);
-            } else {
-                invoiceItems[findIndex].quantity = invoiceItems[findIndex].quantity + invoice.quantity;
+        const step1 = invoiceStatusCopy.serving.reduce((acc: IInvoiceResponse[][], curr, index) => {
+            if (index == 0) {
+                return [[curr]];
             }
+            const t = new Date(curr.createdAt as string);
+
+            let findIndexPush = -1;
+            acc.forEach((itemAcc, index) => {
+                const t2 = new Date(itemAcc[0].createdAt as string);
+                console.log(`Time: `, itemAcc[0].createdAt, ' - ', curr.createdAt);
+                console.log(`Time: `, t2.toLocaleTimeString(), ' - ', t.toLocaleTimeString());
+                t2.setMinutes(t2.getMinutes() + MINUTES_GROUP);
+                if (t.getTime() < t2.getTime()) {
+                    findIndexPush = index;
+                }
+                console.log('for : ', index);
+            });
+
+            if (findIndexPush < 0) {
+                console.log('index < 0 : ', findIndexPush);
+                return [...acc, [curr]];
+            }
+
+            const arr = [...acc];
+            console.log({ arr });
+            arr[findIndexPush].push(curr);
+            console.log({ arr });
+            return arr;
+        }, [] as IInvoiceResponse[][]);
+        console.log(`file: ChefPage.vue:48 > TEMP:`, step1);
+
+        const step2 = step1.map((group) => {
+            return group.reduce((acc: IInvoiceGroup[], curr) => {
+                const updateItems = curr.items.map((i) => ({ ...i, invoiceId: curr._id }));
+
+                return [
+                    ...acc,
+                    {
+                        shopId: curr.shopId,
+                        group: [...updateItems],
+                        createdAt: curr.createdAt,
+                        updatedAt: curr.updatedAt,
+                    } as IInvoiceGroup,
+                ];
+            }, [] as IInvoiceGroup[]);
         });
 
-        invoicesServing.length = 0;
-        invoicesServing.push(...invoiceItems);
+        const step3 = step2.map((list) => {
+            return list.reduce((acc, curr, index) => {
+                if (index != 0) {
+                    return {
+                        shopId: curr.shopId,
+                        group: [...acc.group, ...curr.group],
+                        createdAt: curr.createdAt,
+                        updatedAt: curr.updatedAt,
+                    };
+                }
+
+                return {
+                    shopId: curr.shopId,
+                    group: [...curr.group],
+                    createdAt: curr.createdAt,
+                    updatedAt: curr.updatedAt,
+                };
+            }, {} as IInvoiceGroup);
+        });
+
+        const step4 = step3.reduce((acc: IInvoiceGroup2[], curr) => {
+            const group: IInvoiceItemGroup2[] = [];
+            curr.group.forEach((element, index) => {
+                if (index != 0) {
+                    const findIndex = group.findIndex((i) => i.product._id === element.product._id);
+                    if (findIndex >= 0) {
+                        group[findIndex].invoiceId.push(element.invoiceId);
+                        group[findIndex].quantity += element.quantity;
+                    } else {
+                        group.push({ ...element, invoiceId: [element.invoiceId] });
+                    }
+                } else {
+                    group.push({ ...element, invoiceId: [element.invoiceId] });
+                }
+            });
+
+            return [
+                ...acc,
+                {
+                    shopId: curr.shopId,
+                    group: group,
+                    createdAt: curr.createdAt,
+                    updatedAt: curr.updatedAt,
+                } as IInvoiceGroup2,
+            ];
+        }, [] as IInvoiceGroup2[]);
+
+        console.log(`file: ChefPage.vue:63 > temp2:`, step2);
+        console.log(`file: ChefPage.vue:63 > temp3:`, step3);
+        console.log(`file: ChefPage.vue:63 > temp4:`, step4);
+
+        invoicesItemGroup.length = 0;
+        invoicesItemGroup.push(...step4);
     }
 };
 
@@ -42,20 +133,32 @@ onBeforeMount(async () => {
 
 watchEffect(() => {
     invoiceStatus = store.getters['invoices'];
-    handleMap(invoiceStatus);
+    if (invoiceStatus) handleMap(invoiceStatus);
 });
 </script>
 
 <template>
     <div class="wrapper">
-        <ChefView :invoices="invoicesServing" />
+        <div class="scroll-container">
+            <ChefView :food-group="invoicesItemGroup" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
+@use '../styles/index' as *;
+
 .wrapper {
-    .name {
-        font-size: 1.4rem;
+    width: 100%;
+    height: calc(100vh - $footer-height);
+    .scroll-container {
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }
 </style>
