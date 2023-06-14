@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { joinRoomShopWaiter, onGetOrderFromCustomer } from './socket/waiter.socket';
+import { joinRoomShopWaiter, onGetOrderFromCustomer, onReceiveInvoiceItemDone } from './socket/waiter.socket';
 import { joinRoomShopChef, onGetOrderFromWaiter } from './socket/chef.socket';
 import { useStore } from 'vuex';
 import roleName from './config/roleName';
@@ -10,6 +10,7 @@ const store = useStore();
 onMounted(() => {
     onGetOrderFromCustomer();
     onGetOrderFromWaiter();
+    onReceiveInvoiceItemDone();
 
     const role = store.getters['userRole'];
 

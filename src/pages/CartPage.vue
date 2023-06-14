@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watchEffect } from 'vue';
+import { ref, reactive, watchEffect, onMounted, watch } from 'vue';
 import ScreenBase from '../components/ScreenBase.vue';
 import Button from '../components/Button.vue';
 import InputQuantity from '../components/InputQuantity.vue';
@@ -12,14 +12,33 @@ import { IInvoice, IInvoiceItem } from '../interfaces/invoice.interface';
 import ModalLoading from '../components/Modal/ModalLoading.vue';
 import { emitInvoiceToWaiter } from '../socket/waiter.socket';
 import { IUserResponse } from '../interfaces/auth.interface';
+import ModalChooseArea from '../components/Modal/ModalChooseArea.vue';
+import { IArea, IAreaInfo } from '../interfaces/area.interface';
+import { IOption } from '../components/Select.vue';
 
 const cartItems = ref<ICartItem[]>([]);
 const countCart = ref<string>('');
 const invoicePrice = ref<number>(0);
+const area = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
 const store = useStore();
 
 const status = ref<'loading' | 'success' | 'error'>('loading');
 const isShowModal = ref<boolean>(false);
+const isShowModalArea = ref<boolean>(false);
+
+const areas = ref<IArea[]>([]);
+const selected = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
+
+onMounted(async () => {
+    await store.dispatch('fetchAreas');
+    areas.value.push(...store.getters['areas']);
+
+    const areaFirst = areas.value[0];
+    selected.areaId = areaFirst._id as string;
+    selected.areaName = areaFirst.name;
+    selected.tableId = areaFirst.tables[0]._id as string;
+    selected.tableName = areaFirst.tables[0].name;
+});
 
 watchEffect(() => {
     cartItems.value = store.getters['cartItems'];
@@ -52,6 +71,8 @@ async function handleOrder() {
                 productId: item.product._id as string,
                 quantity: item.quantity,
                 status: 'waitingFood',
+                done: 0,
+                delivered: 0,
             }),
         );
 
@@ -65,6 +86,12 @@ async function handleOrder() {
                 customerPhone: customer.phone,
                 items: cartItemRequest,
                 status: 'waitingConfirm',
+                area: {
+                    areaId: selected.areaId,
+                    areaName: selected.areaName,
+                    tableId: selected.tableId,
+                    tableName: selected.tableName,
+                },
             };
 
             const result = await invoiceService.create(newInvoice);
@@ -111,9 +138,13 @@ function toggleShowModal() {
         <template v-slot:footer>
             <div class="cart__footer">
                 <div class="invoice__wrapper">
-                    <span class="invoice-label">Tổng thanh toán</span>
+                    <span class="invoice-label">Tạm tính</span>
                     <span class="invoice-price"> {{ formatMoney(invoicePrice) }} đ</span>
                 </div>
+
+                <Button :click="() => (isShowModalArea = true)">{{
+                    selected.areaName == '' ? 'Chọn bàn' : `${selected.areaName} - ${selected.tableName}`
+                }}</Button>
 
                 <Button class="order-btn" :click="handleOrder">Đặt món {{ countCart }}</Button>
             </div>
@@ -126,6 +157,19 @@ function toggleShowModal() {
         :loading-msg="'Đang gọi món'"
         :success-msg="'Đã gọi món'"
         :error-msg="'Gọi món lỗi'"
+    />
+
+    <ModalChooseArea
+        @cancel="() => (isShowModalArea = false)"
+        @value="(value:IAreaInfo)=>{
+        area.areaId= value.areaId;
+        area.areaName=value.areaName;
+        area.tableId= value.tableId;
+        area.tableName=value.tableName;
+    }"
+        :areas="areas"
+        :selected="selected"
+        v-if="isShowModalArea"
     />
 </template>
 

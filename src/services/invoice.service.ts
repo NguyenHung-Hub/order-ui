@@ -1,4 +1,10 @@
-import { IInvoice, IInvoiceResponse } from '../interfaces/invoice.interface';
+import {
+    IInvoice,
+    IInvoiceItemGroup,
+    IInvoiceResponse,
+    IUpdateQuantityDelivered,
+    IUpdateQuantityDone,
+} from '../interfaces/invoice.interface';
 import httpRequest from '../utils/httpRequest';
 
 export const create = async (invoice: IInvoice): Promise<IInvoiceResponse | undefined> => {
@@ -37,5 +43,25 @@ export const update = async (invoice: IInvoice): Promise<IInvoiceResponse | unde
         return result.data.data;
     } catch (error) {
         console.log(`file: invoice.service.ts:36 > error:`, error);
+    }
+};
+
+export const updateQuantityDone = async (items: IUpdateQuantityDone[]): Promise<IInvoiceResponse[] | undefined> => {
+    try {
+        const result = await httpRequest.put(`/invoice/done`, { items });
+        return result.data.data;
+    } catch (error) {
+        console.log(`file: invoice.service.ts:52 > error:`, error);
+    }
+};
+
+export const updateQuantityDelivered = async (
+    item: IUpdateQuantityDelivered,
+): Promise<IInvoiceResponse[] | undefined> => {
+    try {
+        const result = await httpRequest.put(`/invoice/delivered`, { ...item });
+        return result.data.data;
+    } catch (error) {
+        console.log(`file: invoice.service.ts:65 > error:`, error);
     }
 };

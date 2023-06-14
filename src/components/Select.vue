@@ -15,11 +15,12 @@ const props = withDefaults(defineProps<Props>(), {
     width: 100,
 });
 
-const emit = defineEmits<{ (event: 'value', value: string): void }>();
+const emit = defineEmits<{ (event: 'value', value: string, name: string): void }>();
 const selectWidth = computed(() => `${props.width}px`);
 
 function onChange(event: any) {
-    emit('value', event.target.value);
+    const name = props.options.find((i) => i.value == event.target.value)?.name;
+    emit('value', event.target.value, name as string);
 }
 </script>
 

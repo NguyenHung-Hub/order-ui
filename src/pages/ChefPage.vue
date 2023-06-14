@@ -96,6 +96,8 @@ const handleMap = (invoiceStatus: IInvoiceStatus) => {
                     if (findIndex >= 0) {
                         group[findIndex].invoiceId.push(element.invoiceId);
                         group[findIndex].quantity += element.quantity;
+                        group[findIndex].done += element.done;
+                        group[findIndex].delivered += element.delivered;
                     } else {
                         group.push({ ...element, invoiceId: [element.invoiceId] });
                     }

@@ -1,3 +1,4 @@
+import { IAreaInfo } from './area.interface';
 import { ICartItem, ICartItemRequest } from './cart.interface';
 import { ITimeStamps } from './index.interface';
 import { IProduct } from './product.interface';
@@ -7,6 +8,8 @@ export type TInvoiceItemStatus = 'waitingFood' | 'finishFood' | 'finish' | 'canc
 
 export interface IInvoiceItemBase {
     quantity: number;
+    done: number;
+    delivered: number;
     status: TInvoiceItemStatus;
 }
 
@@ -24,6 +27,7 @@ interface IInvoiceBase {
     customerName?: string;
     customerPhone?: string;
     status: TInvoiceStatus;
+    area: IAreaInfo;
 }
 export interface IInvoice extends IInvoiceBase {
     _id?: string;
@@ -57,3 +61,12 @@ export interface IInvoiceGroup2 extends ITimeStamps {
     shopId: string;
     group: IInvoiceItemGroup2[];
 }
+
+export interface IUpdateQuantityDone {
+    invoiceId: string;
+    productId: string;
+    quantity: number;
+    status: TInvoiceItemStatus;
+}
+
+export interface IUpdateQuantityDelivered extends IUpdateQuantityDone {}

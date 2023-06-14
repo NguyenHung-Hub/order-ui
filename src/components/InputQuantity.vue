@@ -39,7 +39,6 @@ watch(quantity, () => {
     }
 
     emit('onChange', quantity.value);
-    console.log(`file: InputQuantity.vue:43 > quantity.value:`, quantity.value);
 });
 
 function focusHandle() {

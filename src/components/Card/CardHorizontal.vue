@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
-import { IInvoice, IInvoiceResponse } from '../../interfaces/invoice.interface';
+import { IInvoice, IInvoiceItemResponse, IInvoiceResponse } from '../../interfaces/invoice.interface';
 import { UpdateInvoiceDto } from '../../dtos/invoice.dto';
-import { formatDate, formatMoney } from '../../utils/format';
+import { formatDate } from '../../utils/format';
 import Button from '../../components/Button.vue';
-import ArrowRightIcon from '../../components/Icons/ArrowRightIcon.vue';
 import ModalConfirm from '../Modal/ModalConfirm.vue';
 import * as invoiceService from '../../services/invoice.service';
 import { calcTotal } from '../../utils/calcInvoices';
 import { useStore } from 'vuex';
 import { IMoveInvoiceData } from '../../store/module/invoice/invoice';
 import { TRoleName } from '../../interfaces/auth.interface';
-import DotHorizontal from '../Loading/DotHorizontal.vue';
-import LabelLoading from '../Loading/LabelLoading.vue';
 import { emitInvoiceToChef } from '../../socket/chef.socket';
+import CardServing from './CardServing.vue';
 
 interface Props {
     invoices: IInvoiceResponse[];
@@ -52,7 +50,7 @@ function showModal(invoiceId: string) {
 /**
  * update field status:'serving'
  */
-async function confirmUpdateInvoice() {
+async function confirmAndUpdateInvoice() {
     isShowModal.value = false;
     console.log(invoiceIdOnClick.value);
 
@@ -66,47 +64,31 @@ async function confirmUpdateInvoice() {
         emitInvoiceToChef(result);
     }
 }
+
+function checkDeliveredAll(item: IInvoiceItemResponse[]) {
+    return item.every((i) => i.quantity == i.delivered);
+}
 </script>
 
 <template>
     <div class="card-list__wrapper">
         <div class="card__section" v-for="invoice in props.invoices" :key="invoice._id">
             <div class="card__body" v-for="(item, index) in invoice.items" :key="index">
-                <img class="product__preview" :src="item.product.photo" alt="" />
-                <div class="card__info">
-                    <div class="product__name">{{ item.product.name }}</div>
-                    <div class="product__price">
-                        <div class="product__quantity">x{{ item.quantity }}</div>
-                        <div class="product__price--sale">{{ formatMoney(item.product.priceSale) }}đ</div>
-                        <div class="product__total">
-                            <span>Thành tiền:</span> {{ formatMoney(item.product.priceSale * item.quantity) }}đ
-                        </div>
-                    </div>
-                </div>
-                <Button class="btn-right" :to="`/detail?p=${item.product.slug}`" v-if="isCustomer">
-                    <span>Xem</span>
-                    <ArrowRightIcon :color="`#ff964f`" :width="'1.1rem'" :height="'0.8rem'" />
-                </Button>
-
-                <div v-if="isWaiter">
-                    <LabelLoading
-                        class="btn-right"
-                        :label="'Chờ món'"
-                        v-if="invoice.status === 'serving' && item.status === 'waitingFood'"
-                    />
-                    <Button class="btn-right" success v-if="item.status === 'finishFood'"> Giao món </Button>
-                    <Button class="btn-right" outline v-if="item.status === 'finish'"> Đã giao </Button>
-                </div>
+                <CardServing
+                    :invoice-id="invoice._id"
+                    :invoice-item="item"
+                    :invoice-status="invoice.status"
+                    :invoice-area="`${invoice.area.areaName} - ${invoice.area.tableName}`"
+                />
             </div>
             <div class="card-footer">
                 <div class="info__wrapper" v-if="showInfo">
                     <p class="info-label">Khách: {{ invoice.customerName }}</p>
-                    <p class="info-label">{{ invoice.customerPhone }}</p>
-                    <p>0 / {{ invoice.items.length }} Đã giao</p>
+                    <p class="info-label">{{ invoice.area.areaName }} - {{ invoice.area.tableName }}</p>
                 </div>
                 <div class="info__wrapper">
                     <p class="info-label">{{ formatDate(invoice.updatedAt as string) }}</p>
-                    <p class="info-label"><span>Tổng tiền:</span> {{ calcTotal(invoice) }}đ</p>
+                    <p class="info-label"><span>Tạm tính:</span> {{ calcTotal(invoice) }}đ</p>
 
                     <div v-if="isWaiter">
                         <Button
@@ -116,7 +98,7 @@ async function confirmUpdateInvoice() {
                         >
                             Nhận đơn
                         </Button>
-                        <Button primary v-if="invoice.status === 'serving'">Xác nhận thanh toán</Button>
+                        <Button primary v-if="checkDeliveredAll(invoice.items)">Xác nhận thanh toán</Button>
 
                         <Button outline v-if="invoice.status === 'finish'">Xong</Button>
                     </div>
@@ -125,7 +107,7 @@ async function confirmUpdateInvoice() {
         </div>
     </div>
 
-    <ModalConfirm :msg="'Nhận đơn???'" @okay="confirmUpdateInvoice" v-if="isShowModal" />
+    <ModalConfirm :msg="'Nhận đơn???'" @okay="confirmAndUpdateInvoice" v-if="isShowModal" />
 </template>
 
 <style scoped lang="scss">
@@ -162,54 +144,6 @@ async function confirmUpdateInvoice() {
 
             background-color: #fff;
             border-bottom: 1px solid #f3f3f3;
-
-            .product__preview {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-
-                border-radius: 4px;
-            }
-            .card__info {
-                display: flex;
-                justify-content: space-around;
-                flex-direction: column;
-                padding: 0 16px;
-                .product__name {
-                    font-size: 1.6rem;
-                }
-                .product__price {
-                    display: flex;
-                    flex-direction: column;
-
-                    .product__quantity {
-                        font-size: 1.4rem;
-                        font-weight: 300;
-                        color: $disable-text-color;
-                    }
-                    .product__price--sale {
-                        font-size: 1.4rem;
-                        color: $price-color;
-                    }
-
-                    .product__total {
-                        @include textPrice();
-                    }
-                }
-            }
-            .btn-right {
-                position: absolute;
-                right: 4px;
-                bottom: 4px;
-                margin: 0;
-                // padding: 8px;
-
-                color: #ff964f;
-
-                span {
-                    margin-right: 4px;
-                }
-            }
         }
 
         .card-footer {

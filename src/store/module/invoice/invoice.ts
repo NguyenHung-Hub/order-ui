@@ -66,6 +66,15 @@ const productStore: StoreBase = {
             state.invoices[data.to] = [...state.invoices[data.to], data.invoice];
         },
 
+        updateInvoiceItemsServing(state: InvoicesState, data: IInvoiceResponse) {
+            state.invoices.serving = state.invoices.serving.map((invoice) => {
+                if (invoice._id == data._id) {
+                    return data;
+                }
+                return invoice;
+            });
+        },
+
         setError(state: InvoicesState, errorPayload: any) {
             state.error = errorPayload;
         },
@@ -121,9 +130,20 @@ const productStore: StoreBase = {
         addInvoiceServing(context: ActionContext<InvoicesState, RootState>, data: IMoveInvoiceData) {
             context.commit('addInvoiceServing', data);
         },
+        getInvoiceServing(context: ActionContext<InvoicesState, RootState>, id: string) {
+            return context.state.invoices.serving.filter((i) => i._id === id)[0];
+        },
 
         moveInvoice(context: ActionContext<InvoicesState, RootState>, data: IMoveInvoiceData) {
             context.commit('moveInvoice', data);
+        },
+        updateInvoiceItemsDone(context: ActionContext<InvoicesState, RootState>, data: IInvoiceResponse[]) {
+            data.forEach((newInvoice) => {
+                context.commit('updateInvoiceItemsServing', newInvoice);
+            });
+        },
+        updateInvoiceItemsDelivered(context: ActionContext<InvoicesState, RootState>, data: IInvoiceResponse) {
+            context.commit('updateInvoiceItemsServing', data);
         },
     },
 
