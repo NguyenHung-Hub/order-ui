@@ -29,7 +29,6 @@ export const getByShop = async (shopId: string): Promise<IInvoiceResponse[] | un
     try {
         const result = await httpRequest.get(`/invoice?shopId=${shopId}`);
         if (result.data.data) {
-            console.log(`file: invoice.service.ts:26 > result.data.data:`, result.data.data[3]);
             return result.data.data;
         }
     } catch (error) {

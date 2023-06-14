@@ -9,13 +9,11 @@ async function addOrderServing(data: IInvoiceResponse) {
 }
 
 export const joinRoomShopChef = (shopId: string) => {
-    console.log(`joinRoomShopChef: `, shopId);
     socket.emit('joinRoomShopChef', shopId);
 };
 
 export const onGetOrderFromWaiter = () => {
     socket.on('newOrderChef', (data) => {
-        console.log('newOrderChef:', data);
         addOrderServing(data);
     });
 };

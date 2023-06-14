@@ -36,7 +36,6 @@ const productStore: StoreBase = {
 
         setInvoicesServing(state: InvoicesState, invoicesPayload: IInvoiceResponse[]) {
             state.invoices.serving = invoicesPayload;
-            console.log(`file: invoice.ts:39 > invoicesPayload:`, invoicesPayload);
         },
         addInvoiceServing(state: InvoicesState, invoicePayload: IInvoiceResponse) {
             state.invoices.serving = [...state.invoices.serving, invoicePayload];
@@ -83,7 +82,6 @@ const productStore: StoreBase = {
         async fetchInvoices(context: ActionContext<InvoicesState, RootState>, shopId: string) {
             try {
                 const result: IInvoiceResponse[] | undefined = await invoiceService.getByShop(shopId);
-                console.log(`file: invoice.ts:77 > result:`, result);
 
                 if (!result) {
                     context.commit('setError', 'undefined');
@@ -111,8 +109,6 @@ const productStore: StoreBase = {
 
                     resolve({ waitingConfirm, serving, finish, cancel });
                 }).then((data: IInvoiceStatus) => {
-                    console.log(`file: invoice.ts:105 > data:`, data);
-
                     context.commit('setInvoicesWaiting', data.waitingConfirm);
 
                     context.commit('setInvoicesServing', data.serving);

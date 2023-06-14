@@ -30,7 +30,6 @@ const authStore: StoreBase = {
         setUser(state: AuthState, userPayload: IUserResponse) {
             state.user = userPayload;
             state.isAuthenticated = true;
-            console.log(state);
         },
 
         setError(state: AuthState, errorPayload: any) {
