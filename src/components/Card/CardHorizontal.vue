@@ -4,7 +4,7 @@ import { IInvoice, IInvoiceItemResponse, IInvoiceResponse } from '../../interfac
 import { UpdateInvoiceDto } from '../../dtos/invoice.dto';
 import { formatDate } from '../../utils/format';
 import Button from '../../components/Button.vue';
-import ModalConfirm from '../Modal/ModalConfirm.vue';
+import ModalConfirmInvoice from '../Modal/ModalConfirmInvoice.vue';
 import * as invoiceService from '../../services/invoice.service';
 import { calcTotal } from '../../utils/calcInvoices';
 import { useStore } from 'vuex';
@@ -107,7 +107,7 @@ function checkDeliveredAll(item: IInvoiceItemResponse[]) {
         </div>
     </div>
 
-    <ModalConfirm :msg="'Nhận đơn???'" @okay="confirmAndUpdateInvoice" v-if="isShowModal" />
+    <ModalConfirmInvoice :msg="'Nhận đơn???'" @okay="confirmAndUpdateInvoice" v-if="isShowModal" />
 </template>
 
 <style scoped lang="scss">
