@@ -72,7 +72,6 @@ watchEffect(() => {
         >
             Giao món ({{ invoiceItem.done - invoiceItem.delivered }})
         </Button>
-        <Button class="btn-right" outline v-if="invoiceItem.status === 'finish'"> Đã giao </Button>
     </div>
 
     <ModalDeliveredFood

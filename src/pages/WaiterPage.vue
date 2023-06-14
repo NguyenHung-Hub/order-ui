@@ -20,7 +20,7 @@ watchEffect(() => {
 
 <template>
     <div class="waiter-page__wrapper">
-        <TabBase :tab-names="['Mới', 'Phục vụ', 'Đã xong']">
+        <TabBase :tab-names="['Mới', 'Phục vụ', 'Chờ thanh toán', 'Đã thanh toán']">
             <template v-slot:tabPanel-1>
                 <div class="scroll-container">
                     <CardHorizontal :invoices="invoiceStatus?.waitingConfirm" show-info />
@@ -32,6 +32,7 @@ watchEffect(() => {
                 </div>
             </template>
             <template v-slot:tabPanel-3>tab 3</template>
+            <template v-slot:tabPanel-4>tab 4</template>
         </TabBase>
     </div>
 </template>

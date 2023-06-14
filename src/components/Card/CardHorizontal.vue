@@ -82,12 +82,12 @@ function checkDeliveredAll(item: IInvoiceItemResponse[]) {
                 />
             </div>
             <div class="card-footer">
-                <div class="info__wrapper" v-if="showInfo">
+                <div class="left__wrapper" v-if="showInfo">
                     <p class="info-label">Khách: {{ invoice.customerName }}</p>
                     <p class="info-label">{{ invoice.area.areaName }} - {{ invoice.area.tableName }}</p>
+                    <p class="info-label">{{ formatDate(invoice.createdAt as string) }}</p>
                 </div>
-                <div class="info__wrapper">
-                    <p class="info-label">{{ formatDate(invoice.updatedAt as string) }}</p>
+                <div class="right__wrapper">
                     <p class="info-label"><span>Tạm tính:</span> {{ calcTotal(invoice) }}đ</p>
 
                     <div v-if="isWaiter">
@@ -98,7 +98,7 @@ function checkDeliveredAll(item: IInvoiceItemResponse[]) {
                         >
                             Nhận đơn
                         </Button>
-                        <Button primary v-if="checkDeliveredAll(invoice.items)">Xác nhận thanh toán</Button>
+                        <Button primary v-if="checkDeliveredAll(invoice.items)">Xong</Button>
 
                         <Button outline v-if="invoice.status === 'finish'">Xong</Button>
                     </div>
@@ -143,42 +143,38 @@ function checkDeliveredAll(item: IInvoiceItemResponse[]) {
             display: flex;
 
             background-color: #fff;
-            border-bottom: 1px solid #f3f3f3;
+            border-bottom: 1px solid #ededed;
         }
 
         .card-footer {
             display: flex;
-
-            flex-direction: column;
+            justify-content: space-between;
 
             padding: 4px 0;
 
-            .info__wrapper {
+            .left__wrapper {
                 display: flex;
+                flex-direction: column;
                 padding: 2px 0;
                 .info-label {
                     @include textStyle();
+                    padding: 2px 0px;
                     margin-right: 8px;
                     font-weight: 500;
-                }
 
-                &:last-child {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    .info-label {
-                        &:nth-child(1) {
-                            font-style: italic;
-                            color: #70deb1;
-                            font-weight: 400;
-                        }
-                        &:nth-child(2) {
-                            flex: 1;
-                            text-align: right;
-                            @include textPrice();
-                        }
+                    &:last-child {
+                        color: $success;
                     }
+                }
+            }
+
+            .right__wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                .info-label {
+                    @include textPrice();
+                    margin-bottom: 8px;
                 }
             }
         }
