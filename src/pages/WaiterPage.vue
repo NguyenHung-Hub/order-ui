@@ -15,6 +15,7 @@ onMounted(async () => {
 
 watchEffect(() => {
     invoiceStatus.value = store.getters['invoices'];
+    console.log(`file: WaiterPage.vue:18 >  invoiceStatus.value :`, invoiceStatus.value);
 });
 </script>
 
@@ -31,7 +32,11 @@ watchEffect(() => {
                     <CardHorizontal :invoices="invoiceStatus?.serving" show-info />
                 </div>
             </template>
-            <template v-slot:tabPanel-3>tab 3</template>
+            <template v-slot:tabPanel-3>
+                <div class="scroll-container">
+                    <CardHorizontal :invoices="invoiceStatus?.delivered" show-info />
+                </div>
+            </template>
             <template v-slot:tabPanel-4>tab 4</template>
         </TabBase>
     </div>

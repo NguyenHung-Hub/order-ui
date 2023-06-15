@@ -3,7 +3,7 @@ import { ICartItem, ICartItemRequest } from './cart.interface';
 import { ITimeStamps } from './index.interface';
 import { IProduct } from './product.interface';
 
-export type TInvoiceStatus = 'waitingConfirm' | 'serving' | 'finish' | 'cancel';
+export type TInvoiceStatus = 'waitingConfirm' | 'serving' | 'delivered' | 'finish' | 'cancel';
 export type TInvoiceItemStatus = 'waitingFood' | 'finishFood' | 'finish' | 'cancel';
 
 export interface IInvoiceItemBase {
@@ -42,6 +42,7 @@ export interface IInvoiceResponse extends ITimeStamps, IInvoiceBase {
 export interface IInvoiceStatus {
     waitingConfirm: Array<IInvoiceResponse> | [];
     serving: Array<IInvoiceResponse> | [];
+    delivered: Array<IInvoiceResponse> | [];
     finish: Array<IInvoiceResponse> | [];
     cancel: Array<IInvoiceResponse> | [];
 }
@@ -70,3 +71,7 @@ export interface IUpdateQuantityDone {
 }
 
 export interface IUpdateQuantityDelivered extends IUpdateQuantityDone {}
+
+export interface IUpdateInvoiceOptional extends Partial<IInvoiceBase> {
+    _id: string;
+}

@@ -20,6 +20,7 @@ const productStore: StoreBase = {
             invoices: {
                 waitingConfirm: [],
                 serving: [],
+                delivered: [],
                 finish: [],
                 cancel: [],
             },
@@ -39,6 +40,13 @@ const productStore: StoreBase = {
         },
         addInvoiceServing(state: InvoicesState, invoicePayload: IInvoiceResponse) {
             state.invoices.serving = [...state.invoices.serving, invoicePayload];
+        },
+
+        setInvoicesDelivered(state: InvoicesState, invoicesPayload: IInvoiceResponse[]) {
+            state.invoices.delivered = invoicesPayload;
+        },
+        addInvoiceDelivered(state: InvoicesState, invoicePayload: IInvoiceResponse) {
+            state.invoices.delivered = [...state.invoices.delivered, invoicePayload];
         },
 
         setInvoicesFinish(state: InvoicesState, invoicesPayload: IInvoiceResponse[]) {
@@ -91,6 +99,7 @@ const productStore: StoreBase = {
                 new Promise<IInvoiceStatus>((resolve, reject) => {
                     const waitingConfirm: IInvoiceResponse[] = [];
                     const serving: IInvoiceResponse[] = [];
+                    const delivered: IInvoiceResponse[] = [];
                     const finish: IInvoiceResponse[] = [];
                     const cancel: IInvoiceResponse[] = [];
                     result.forEach((invoice) => {
@@ -98,6 +107,8 @@ const productStore: StoreBase = {
                             waitingConfirm.push(invoice);
                         } else if (invoice.status === 'serving') {
                             serving.push(invoice);
+                        } else if (invoice.status === 'delivered') {
+                            delivered.push(invoice);
                         } else if (invoice.status === 'finish') {
                             finish.push(invoice);
                         } else if (invoice.status === 'cancel') {
@@ -107,11 +118,12 @@ const productStore: StoreBase = {
                         }
                     });
 
-                    resolve({ waitingConfirm, serving, finish, cancel });
+                    resolve({ waitingConfirm, serving, delivered, finish, cancel });
                 }).then((data: IInvoiceStatus) => {
                     context.commit('setInvoicesWaiting', data.waitingConfirm);
 
                     context.commit('setInvoicesServing', data.serving);
+                    context.commit('setInvoicesDelivered', data.delivered);
                     context.commit('setInvoicesFinish', data.finish);
                     context.commit('addInvoiceCancel', data.cancel);
                 });

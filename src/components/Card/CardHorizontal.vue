@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
-import { IInvoice, IInvoiceItemResponse, IInvoiceResponse } from '../../interfaces/invoice.interface';
-import { UpdateInvoiceDto } from '../../dtos/invoice.dto';
+import { IInvoiceItemResponse, IInvoiceResponse, IUpdateInvoiceOptional } from '../../interfaces/invoice.interface';
 import { formatDate } from '../../utils/format';
 import Button from '../../components/Button.vue';
-import ModalConfirmInvoice from '../Modal/ModalConfirmInvoice.vue';
+import ModalConfirm from '../Modal/ModalConfirm.vue';
 import * as invoiceService from '../../services/invoice.service';
 import { calcTotal } from '../../utils/calcInvoices';
 import { useStore } from 'vuex';
@@ -12,6 +11,7 @@ import { IMoveInvoiceData } from '../../store/module/invoice/invoice';
 import { TRoleName } from '../../interfaces/auth.interface';
 import { emitInvoiceToChef } from '../../socket/chef.socket';
 import CardServing from './CardServing.vue';
+import { IAreaInfo } from '../../interfaces/area.interface';
 
 interface Props {
     invoices: IInvoiceResponse[];
@@ -22,10 +22,13 @@ const store = useStore();
 const props = withDefaults(defineProps<Props>(), {
     showInfo: false,
 });
-const isShowModal = ref(false);
+const isShowModalDelivered = ref(false);
+const isShowModalConfirmDelivered = ref(false);
+
 const isCustomer = ref(false);
 const isWaiter = ref(false);
 const invoiceIdOnClick = ref('');
+const messageConfirmDeliveredAll = ref<string>('');
 
 watchEffect(() => {
     const role: TRoleName = store.getters['userRole'];
@@ -42,8 +45,8 @@ watchEffect(() => {
     }
 });
 
-function showModal(invoiceId: string) {
-    isShowModal.value = true;
+function showModalDelivered(invoiceId: string) {
+    isShowModalDelivered.value = true;
     invoiceIdOnClick.value = invoiceId;
 }
 
@@ -51,12 +54,12 @@ function showModal(invoiceId: string) {
  * update field status:'serving'
  */
 async function confirmAndUpdateInvoice() {
-    isShowModal.value = false;
+    isShowModalDelivered.value = false;
     console.log(invoiceIdOnClick.value);
 
     const findInvoice = props.invoices.filter((i) => i._id === invoiceIdOnClick.value);
-    const updateInvoice: IInvoice = new UpdateInvoiceDto({ ...findInvoice[0], status: 'serving' });
-    const result = await invoiceService.update(updateInvoice);
+    const updateInvoice: IUpdateInvoiceOptional = { _id: findInvoice[0]._id, status: 'serving' };
+    const result = await invoiceService.updateOptional(updateInvoice);
 
     if (result) {
         const dataMoveInvoice: IMoveInvoiceData = { invoice: result, from: 'waitingConfirm', to: 'serving' };
@@ -67,6 +70,25 @@ async function confirmAndUpdateInvoice() {
 
 function checkDeliveredAll(item: IInvoiceItemResponse[]) {
     return item.every((i) => i.quantity == i.delivered);
+}
+
+function showModalConfirmDelivered(invoiceId: string, areaInfo: IAreaInfo) {
+    messageConfirmDeliveredAll.value = `Đã giao tất cả món cho ${areaInfo.tableName} - ${areaInfo.areaName}`;
+    isShowModalConfirmDelivered.value = true;
+    invoiceIdOnClick.value = invoiceId;
+}
+async function confirmDeliveredAll() {
+    try {
+        const result = await invoiceService.updateOptional({ _id: invoiceIdOnClick.value, status: 'delivered' });
+
+        if (result) {
+            const dataMoveInvoice: IMoveInvoiceData = { invoice: result, from: 'serving', to: 'delivered' };
+            await store.dispatch('moveInvoice', dataMoveInvoice);
+            isShowModalConfirmDelivered.value = false;
+        }
+    } catch (error) {
+        console.log(`file: CardHorizontal.vue:95 > error:`, error);
+    }
 }
 </script>
 
@@ -93,21 +115,36 @@ function checkDeliveredAll(item: IInvoiceItemResponse[]) {
                     <div v-if="isWaiter">
                         <Button
                             success
-                            :click="() => showModal(invoice._id)"
+                            :click="() => showModalDelivered(invoice._id)"
                             v-if="invoice.status === 'waitingConfirm'"
                         >
                             Nhận đơn
                         </Button>
-                        <Button primary v-if="checkDeliveredAll(invoice.items)">Xong</Button>
-
-                        <Button outline v-if="invoice.status === 'finish'">Xong</Button>
+                        <Button
+                            primary
+                            :click="() => showModalConfirmDelivered(invoice._id, invoice.area)"
+                            v-if="checkDeliveredAll(invoice.items) && invoice.status == 'serving'"
+                        >
+                            Xong
+                        </Button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <ModalConfirmInvoice :msg="'Nhận đơn???'" @okay="confirmAndUpdateInvoice" v-if="isShowModal" />
+    <ModalConfirm
+        :msg="'Nhận đơn???'"
+        @okay="confirmAndUpdateInvoice"
+        @cancel="() => (isShowModalDelivered = false)"
+        v-if="isShowModalDelivered"
+    />
+    <ModalConfirm
+        :msg="messageConfirmDeliveredAll"
+        @okay="confirmDeliveredAll"
+        @cancel="() => (isShowModalConfirmDelivered = false)"
+        v-if="isShowModalConfirmDelivered"
+    />
 </template>
 
 <style scoped lang="scss">

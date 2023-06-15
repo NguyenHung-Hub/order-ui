@@ -2,6 +2,7 @@ import {
     IInvoice,
     IInvoiceItemGroup,
     IInvoiceResponse,
+    IUpdateInvoiceOptional,
     IUpdateQuantityDelivered,
     IUpdateQuantityDone,
 } from '../interfaces/invoice.interface';
@@ -37,6 +38,15 @@ export const getByShop = async (shopId: string): Promise<IInvoiceResponse[] | un
 };
 
 export const update = async (invoice: IInvoice): Promise<IInvoiceResponse | undefined> => {
+    try {
+        const result = await httpRequest.put(`/invoice`, invoice);
+        return result.data.data;
+    } catch (error) {
+        console.log(`file: invoice.service.ts:36 > error:`, error);
+    }
+};
+
+export const updateOptional = async (invoice: IUpdateInvoiceOptional): Promise<IInvoiceResponse | undefined> => {
     try {
         const result = await httpRequest.put(`/invoice`, invoice);
         return result.data.data;

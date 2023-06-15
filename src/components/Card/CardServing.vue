@@ -21,7 +21,7 @@ const props = defineProps<Props>();
 
 const isCustomer = ref(false);
 const isWaiter = ref(false);
-const isShowModal = ref(false);
+const isShowModalDelivered = ref(false);
 
 watchEffect(() => {
     const role: TRoleName = store.getters['userRole'];
@@ -67,7 +67,7 @@ watchEffect(() => {
         <Button
             success
             class="btn-right"
-            :click="() => (isShowModal = true)"
+            :click="() => (isShowModalDelivered = true)"
             v-if="invoiceItem.done > invoiceItem.delivered"
         >
             Giao món ({{ invoiceItem.done - invoiceItem.delivered }})
@@ -82,8 +82,8 @@ watchEffect(() => {
         :quantity="invoiceItem.quantity"
         :done="invoiceItem.done"
         :delivered="invoiceItem.delivered"
-        @cancel="() => (isShowModal = false)"
-        v-if="isShowModal"
+        @cancel="() => (isShowModalDelivered = false)"
+        v-if="isShowModalDelivered"
     />
 </template>
 
