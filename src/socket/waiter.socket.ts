@@ -1,6 +1,8 @@
-import AppSocket from './AppSocket';
+import AppSocket, { IJoinRoomData } from './AppSocket';
 import { IInvoiceResponse } from '../interfaces/invoice.interface';
 import store from '../store';
+import { INotifyPrintOrderDone } from '../interfaces/socket.interface';
+import { INotification } from '../interfaces/notification.interface';
 
 const socket = AppSocket.getInstance({ namespace: 'waiter' });
 
@@ -11,8 +13,13 @@ async function addOrder(data: IInvoiceResponse) {
 async function updateInvoiceItemsDone(data: IInvoiceResponse[]) {
     await store.dispatch('updateInvoiceItemsDone', data);
 }
-export const joinRoomShopWaiter = (shopId: string) => {
-    socket.emit('joinRoomShopWaiter', shopId);
+
+async function addNotification(data: INotification) {
+    await store.dispatch('addNotification', data);
+}
+
+export const joinRoomShopWaiter = (data: IJoinRoomData) => {
+    socket.emit('joinRoomShopWaiter', data);
 };
 
 export const onGetOrderFromCustomer = () => {
@@ -29,8 +36,23 @@ export const onReceiveInvoiceItemDone = () => {
     socket.on('receiveInvoiceItemDone', (data) => {
         updateInvoiceItemsDone(data);
     });
+
+    socket.on('receivePrintOrderDone', (notification: INotification) => {
+        console.log(`file: manager.socket.ts:24 > message:`, notification);
+        addNotification(notification);
+    });
+
+    socket.on('disconnect', (reason) => {
+        if (reason == 'io server disconnect' || reason == 'ping timeout' || reason == 'transport close') {
+            socket.connect();
+        }
+    });
 };
 
 export const emitInvoiceItemDone = (invoices: IInvoiceResponse[]) => {
     socket.emit('sendInvoiceItemDone', invoices);
+};
+
+export const emitPrintOrderDone = (data: INotifyPrintOrderDone) => {
+    socket.emit('sendPrintOrderDone', data);
 };

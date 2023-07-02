@@ -5,6 +5,11 @@ interface Namespace {
     namespace: 'customer' | 'waiter' | 'manager' | 'chef';
 }
 
+export interface IJoinRoomData {
+    shopId: string;
+    userId: string;
+}
+
 class AppSocket {
     private static socket: Socket;
     private static manager: Manager;
@@ -12,7 +17,10 @@ class AppSocket {
 
     public static getInstance({ namespace = 'customer' }: Namespace) {
         if (!AppSocket.manager) {
-            AppSocket.manager = new Manager(AppSocket.baseUrl);
+            AppSocket.manager = new Manager(AppSocket.baseUrl, {
+                reconnectionDelay: 5000,
+                reconnectionAttempts: 50,
+            });
         }
 
         AppSocket.socket = AppSocket.manager.socket(`/${namespace}`);

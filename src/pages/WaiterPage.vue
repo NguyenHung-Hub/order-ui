@@ -24,17 +24,21 @@ watchEffect(() => {
         <TabBase :tab-names="['Mới', 'Phục vụ', 'Chờ thanh toán', 'Đã thanh toán']">
             <template v-slot:tabPanel-1>
                 <div class="scroll-container">
-                    <CardHorizontal :invoices="invoiceStatus?.waitingConfirm" show-info />
+                    <CardHorizontal
+                        :invoices="invoiceStatus?.waitingConfirm"
+                        v-if="invoiceStatus?.waitingConfirm"
+                        show-info
+                    />
                 </div>
             </template>
             <template v-slot:tabPanel-2>
                 <div class="scroll-container">
-                    <CardHorizontal :invoices="invoiceStatus?.serving" show-info />
+                    <CardHorizontal :invoices="invoiceStatus?.serving" v-if="invoiceStatus?.serving" show-info />
                 </div>
             </template>
             <template v-slot:tabPanel-3>
                 <div class="scroll-container">
-                    <CardHorizontal :invoices="invoiceStatus?.delivered" show-info />
+                    <CardHorizontal :invoices="invoiceStatus?.delivered" v-if="invoiceStatus?.delivered" show-info />
                 </div>
             </template>
             <template v-slot:tabPanel-4>tab 4</template>

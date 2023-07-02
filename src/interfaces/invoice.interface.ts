@@ -24,6 +24,7 @@ export interface IInvoiceItemResponse extends IInvoiceItemBase {
 interface IInvoiceBase {
     shopId: string;
     customerId?: string;
+    waiterId?: string;
     customerName?: string;
     customerPhone?: string;
     status: TInvoiceStatus;

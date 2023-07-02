@@ -17,6 +17,14 @@ export const create = async (invoice: IInvoice): Promise<IInvoiceResponse | unde
     }
 };
 
+export const getById = async (invoiceId: string): Promise<IInvoiceResponse[] | undefined> => {
+    try {
+        const result = await httpRequest.get(`/invoice?invoiceId=${invoiceId}`);
+        return result.data.data;
+    } catch (error) {
+        console.log(`file: invoice.service.ts:18 > error:`, error);
+    }
+};
 export const getByUser = async (userId: string): Promise<IInvoiceResponse[] | undefined> => {
     try {
         const result = await httpRequest.get(`/invoice?userId=${userId}`);

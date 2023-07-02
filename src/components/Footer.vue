@@ -14,11 +14,14 @@ import roleName from '../config/roleName';
 const store = useStore();
 const shopName = store.getters['shopName'];
 const countCart = ref<number>(0);
+const countNotify = ref<number>(0);
 
 const role = ref<string>('');
 watchEffect(() => {
     countCart.value = store.getters['countCartItem'];
     role.value = store.getters['userRole'];
+
+    countNotify.value = store.getters['countNotification'];
 });
 </script>
 
@@ -45,12 +48,42 @@ watchEffect(() => {
                 </RouterLink>
             </div>
 
-            <div class="nav-item" v-if="role == roleName.WAITER || role == roleName.CHEF">
+            <div class="nav-item" v-if="role == roleName.WAITER">
                 <RouterLink :to="{ name: 'WaiterPage' }" v-slot="{ isActive }">
                     <Button class="nav-btn nav-cart" vertical>
                         <CartIcon class="nav-icon" v-if="isActive" />
                         <CartDisableIcon class="nav-icon" v-else />
                         <span class="nav-text" :class="{ disable: !isActive }">Đơn đặt</span>
+                        <p class="cart-count" v-if="countCart > 0">{{ countCart }}</p>
+                    </Button>
+                </RouterLink>
+            </div>
+            <div class="nav-item" v-if="role == roleName.WAITER">
+                <RouterLink :to="{ name: 'NotifyPage' }" v-slot="{ isActive }">
+                    <Button class="nav-btn nav-notify" vertical>
+                        <CartIcon class="nav-icon" v-if="isActive" />
+                        <CartDisableIcon class="nav-icon" v-else />
+                        <span class="nav-text" :class="{ disable: !isActive }">Thông báo</span>
+                        <p class="notify-count" v-if="countNotify > 0">{{ countNotify }}</p>
+                    </Button>
+                </RouterLink>
+            </div>
+            <div class="nav-item" v-if="role == roleName.CHEF">
+                <RouterLink :to="{ name: 'ChefPage' }" v-slot="{ isActive }">
+                    <Button class="nav-btn nav-cart" vertical>
+                        <CartIcon class="nav-icon" v-if="isActive" />
+                        <CartDisableIcon class="nav-icon" v-else />
+                        <span class="nav-text" :class="{ disable: !isActive }">Đơn đặt</span>
+                        <p class="cart-count" v-if="countCart > 0">{{ countCart }}</p>
+                    </Button>
+                </RouterLink>
+            </div>
+            <div class="nav-item" v-if="role == roleName.MANAGER">
+                <RouterLink :to="{ name: 'CashierPage' }" v-slot="{ isActive }">
+                    <Button class="nav-btn nav-cart" vertical>
+                        <CartIcon class="nav-icon" v-if="isActive" />
+                        <CartDisableIcon class="nav-icon" v-else />
+                        <span class="nav-text" :class="{ disable: !isActive }">Thanh toán</span>
                         <p class="cart-count" v-if="countCart > 0">{{ countCart }}</p>
                     </Button>
                 </RouterLink>
@@ -110,9 +143,11 @@ watchEffect(() => {
                 }
             }
 
-            .nav-cart {
+            .nav-cart,
+            .nav-notify {
                 position: relative;
-                .cart-count {
+                .cart-count,
+                .notify-count {
                     position: absolute;
                     top: 0;
                     right: 10px;

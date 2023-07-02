@@ -5,6 +5,7 @@ import categoryStore from './module/category/category';
 import areaStore from './module/area/area';
 import cartStore from './module/cart/cart';
 import invoiceStore from './module/invoice/invoice';
+import notificationStore from './module/notification/notification';
 
 const store = createStore({
     modules: {
@@ -14,6 +15,7 @@ const store = createStore({
         area: areaStore,
         cart: cartStore,
         invoice: invoiceStore,
+        notification: notificationStore,
     },
 });
 

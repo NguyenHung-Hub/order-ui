@@ -15,10 +15,13 @@ export function formatMoneyStr(n: number) {
 
 export function formatDate(date: string) {
     const newDate = new Date(date);
+    const h = newDate.getHours() < 10 ? `0${newDate.getHours()}` : newDate.getHours();
+    const mi = newDate.getMinutes() < 10 ? `0${newDate.getMinutes()}` : newDate.getMinutes();
+    const d = newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate();
+    const mo = newDate.getMonth() < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1;
+    const y = newDate.getFullYear() < 10 ? `0${newDate.getFullYear()}` : newDate.getFullYear();
 
-    return `${newDate.getHours()}:${newDate.getMinutes()}  ${newDate.getDate()}-${
-        newDate.getMonth() + 1
-    }-${newDate.getFullYear()}`;
+    return `${h}:${mi}  ${d}-${mo}-${y}`;
 }
 
 export function calcPercent(a: number, b: number) {

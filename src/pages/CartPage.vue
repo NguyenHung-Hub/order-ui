@@ -1,33 +1,40 @@
 <script setup lang="ts">
-import { ref, reactive, watchEffect, onMounted, watch } from 'vue';
+import { ref, reactive, watchEffect, onMounted, watch, inject } from 'vue';
 import ScreenBase from '../components/ScreenBase.vue';
 import Button from '../components/Button.vue';
 import InputQuantity from '../components/InputQuantity.vue';
 import CrossIcon from '../components/Icons/CrossIcon.vue';
 import { ICartItem, ICartItemRequest } from '../interfaces/cart.interface';
 import { useStore } from 'vuex';
-import { formatMoney } from '../utils/format';
+import { formatDate, formatMoney } from '../utils/format';
 import * as invoiceService from '../services/invoice.service';
-import { IInvoice, IInvoiceItem } from '../interfaces/invoice.interface';
+import { IInvoice, IInvoiceItem, IInvoiceResponse } from '../interfaces/invoice.interface';
 import ModalLoading from '../components/Modal/ModalLoading.vue';
 import { emitInvoiceToWaiter } from '../socket/waiter.socket';
 import { IUserResponse } from '../interfaces/auth.interface';
 import ModalChooseArea from '../components/Modal/ModalChooseArea.vue';
 import { IArea, IAreaInfo } from '../interfaces/area.interface';
-import { IOption } from '../components/Select.vue';
+import useCookie from '../utils/useCookie';
+import { calcTotal } from '../utils/calcInvoices';
+import ArrowRightIcon from '../components/Icons/ArrowRightIcon.vue';
+import { useRouter } from 'vue-router';
 
 const cartItems = ref<ICartItem[]>([]);
 const countCart = ref<string>('');
 const invoicePrice = ref<number>(0);
 const area = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
 const store = useStore();
+const router = useRouter();
 
 const status = ref<'loading' | 'success' | 'error'>('loading');
 const isShowModal = ref<boolean>(false);
 const isShowModalArea = ref<boolean>(false);
+const order = ref<IInvoiceResponse>();
 
 const areas = ref<IArea[]>([]);
 const selected = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
+
+const cookie = useCookie();
 
 onMounted(async () => {
     await store.dispatch('fetchAreas');
@@ -38,6 +45,8 @@ onMounted(async () => {
     selected.areaName = areaFirst.name;
     selected.tableId = areaFirst.tables[0]._id as string;
     selected.tableName = areaFirst.tables[0].name;
+
+    getInvoiceCookie();
 });
 
 watchEffect(() => {
@@ -49,7 +58,13 @@ watchEffect(() => {
     } else {
         countCart.value = '';
     }
+
+    getInvoiceCookie();
 });
+
+function getInvoiceCookie() {
+    order.value = cookie.getCookie('invoice') ? JSON.parse(cookie.getCookie('invoice') || '') : '';
+}
 
 async function updateQuantity(value: number, cartItem: ICartItem) {
     console.log(`file: CartPage.vue:28 > value:`, value);
@@ -101,6 +116,9 @@ async function handleOrder() {
                 await store.dispatch('clearCart');
                 cartItems.value = [];
                 emitInvoiceToWaiter(result);
+                console.log(result._id);
+
+                cookie.setCookie('invoice', JSON.stringify(result), 24 * 60 * 60 * 1000);
             }
         } catch (error) {
             status.value = 'error';
@@ -112,10 +130,23 @@ async function handleOrder() {
 function toggleShowModal() {
     isShowModal.value = !isShowModal.value;
 }
+
+function handlePreviewInvoice() {
+    router.push({ path: 'preview', query: { invoiceId: order.value?._id } });
+}
 </script>
 
 <template>
     <ScreenBase :title="`Giỏ hàng ${countCart}`" class="cart__wrapper" hasFooter>
+        <div class="ordered__wrapper" v-if="order">
+            <span>{{ formatDate(order.createdAt as string) }}</span>
+            <span>{{ order.items.length }} món </span>
+            <span>{{ calcTotal(order.items) }} đ</span>
+            <Button rounded primary :click="handlePreviewInvoice">
+                <span>Xem</span>
+            </Button>
+        </div>
+
         <div class="cart__body" v-if="cartItems.length > 0">
             <div class="cart__item" v-for="item in cartItems" :key="item.product._id">
                 <img class="product__preview" :src="item.product.photo" alt="" />
@@ -133,7 +164,6 @@ function toggleShowModal() {
                 </Button>
             </div>
         </div>
-        <div class="label" v-else>Giỏ hàng trống</div>
 
         <template v-slot:footer>
             <div class="cart__footer">
@@ -180,6 +210,22 @@ function toggleShowModal() {
     position: relative;
     width: 100%;
     height: 100vh;
+
+    .ordered__wrapper {
+        @include flex-center();
+        justify-content: space-around;
+
+        padding: 8px 0px;
+        font-size: 1.3rem;
+        border-bottom: 1px solid #ebebeb;
+
+        span {
+            font-size: 1.2rem;
+            &:nth-child(3) {
+                color: $price-color;
+            }
+        }
+    }
     .cart__body {
         background-color: #583939;
 

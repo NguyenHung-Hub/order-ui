@@ -58,7 +58,11 @@ async function confirmAndUpdateInvoice() {
     console.log(invoiceIdOnClick.value);
 
     const findInvoice = props.invoices.filter((i) => i._id === invoiceIdOnClick.value);
-    const updateInvoice: IUpdateInvoiceOptional = { _id: findInvoice[0]._id, status: 'serving' };
+    const updateInvoice: IUpdateInvoiceOptional = {
+        _id: findInvoice[0]._id,
+        status: 'serving',
+        waiterId: store.getters['userId'],
+    };
     const result = await invoiceService.updateOptional(updateInvoice);
 
     if (result) {
@@ -110,7 +114,7 @@ async function confirmDeliveredAll() {
                     <p class="info-label">{{ formatDate(invoice.createdAt as string) }}</p>
                 </div>
                 <div class="right__wrapper">
-                    <p class="info-label"><span>Tạm tính:</span> {{ calcTotal(invoice) }}đ</p>
+                    <p class="info-label"><span>Tạm tính:</span> {{ calcTotal(invoice.items) }}đ</p>
 
                     <div v-if="isWaiter">
                         <Button

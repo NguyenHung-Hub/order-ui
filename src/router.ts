@@ -18,6 +18,9 @@ import RegisterPage from './pages/RegisterPage.vue';
 import OrderHistoryPage from './pages/OrderHistoryPage.vue';
 import WaiterPage from './pages/WaiterPage.vue';
 import ChefPage from './pages/ChefPage.vue';
+import PreviewInvoicePage from './pages/PreviewInvoicePage.vue';
+import CashierPage from './pages/CashierPage.vue';
+import NotifyPage from './pages/NotifyPage.vue';
 
 import store from './store';
 
@@ -37,6 +40,9 @@ export const routesName = {
     OrderHistoryPage: 'OrderHistoryPage',
     WaiterPage: 'WaiterPage',
     ChefPage: 'ChefPage',
+    PreviewInvoicePage: 'PreviewInvoicePage',
+    CashierPage: 'CashierPage',
+    NotifyPage: 'NotifyPage',
 };
 
 const shopName = store.getters['shopName'];
@@ -217,6 +223,45 @@ const routes: RouteRecordRaw[] = [
                         path: 'chef',
                         name: routesName.ChefPage,
                         component: ChefPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'PreviewEmptyLayout',
+                component: EmptyLayout,
+                children: [
+                    {
+                        path: 'preview',
+                        name: routesName.PreviewInvoicePage,
+                        component: PreviewInvoicePage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'CashierOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'cashier',
+                        name: routesName.CashierPage,
+                        component: CashierPage,
+                        meta: { requiresAuth: true },
+                    },
+                ],
+            },
+            {
+                path: '',
+                name: 'NotifyOnlyFooterLayout',
+                component: OnlyFooterLayout,
+                children: [
+                    {
+                        path: 'notify',
+                        name: routesName.NotifyPage,
+                        component: NotifyPage,
                         meta: { requiresAuth: true },
                     },
                 ],

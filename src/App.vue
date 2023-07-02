@@ -4,6 +4,8 @@ import { joinRoomShopWaiter, onGetOrderFromCustomer, onReceiveInvoiceItemDone } 
 import { joinRoomShopChef, onGetOrderFromWaiter } from './socket/chef.socket';
 import { useStore } from 'vuex';
 import roleName from './config/roleName';
+import { joinRoomShopManager } from './socket/manager.socket';
+import { onGetInvoicePrint } from './socket/manager.socket';
 
 const store = useStore();
 
@@ -11,16 +13,22 @@ onMounted(() => {
     onGetOrderFromCustomer();
     onGetOrderFromWaiter();
     onReceiveInvoiceItemDone();
+    onGetInvoicePrint();
 
     const role = store.getters['userRole'];
+    const userId = store.getters['userId'];
+    const shopId = store.getters['shopId'];
 
     if (role == roleName.CUSTOMER) {
         document.title = `${store.getters['shopName']}`;
     } else if (role == roleName.WAITER) {
-        joinRoomShopWaiter(store.getters['shopId']);
+        joinRoomShopWaiter({ shopId, userId });
         document.title = `${store.getters['shopName']} - ${role}`;
     } else if (role == roleName.CHEF) {
-        joinRoomShopChef(store.getters['shopId']);
+        joinRoomShopChef(shopId);
+        document.title = `${store.getters['shopName']} - ${role}`;
+    } else if (role == roleName.MANAGER) {
+        joinRoomShopManager({ shopId, userId });
         document.title = `${store.getters['shopName']} - ${role}`;
     }
 });

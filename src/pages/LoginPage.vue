@@ -32,7 +32,6 @@ async function handleLogin() {
                 await store.dispatch('setUser', result);
 
                 if (result.role.name == roleName.WAITER) {
-                    joinRoomShopWaiter(`${result.shop._id}_${roleName.WAITER}`);
                     router.push({ path: `/${result?.shop.name}/waiter` });
                 } else if (result.role.name == roleName.CHEF) {
                     router.push({ path: `/${result?.shop.name}/chef` });

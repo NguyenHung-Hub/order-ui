@@ -55,6 +55,7 @@ const authStore: StoreBase = {
 
     getters: {
         user: (state: AuthState) => state.user,
+        userId: (state: AuthState) => state.user?._id,
         shopName: (state: AuthState) => state.user?.shop.name,
         shopId: (state: AuthState) => state.user?.shop._id,
         isAuthenticated: (state: AuthState) => {
