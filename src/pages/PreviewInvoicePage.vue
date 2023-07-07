@@ -10,6 +10,9 @@ import { emitPrintOrderDone } from '../socket/waiter.socket';
 import { useStore } from 'vuex';
 import { TRoleName } from '../interfaces/auth.interface';
 import ScreenBase from '../components/ScreenBase.vue';
+import ToastCenter from '../components/Toast/ToastCenter.vue';
+import * as notificationService from '../services/notification.service';
+import { INotification } from '../interfaces/notification.interface';
 
 const store = useStore();
 const route = useRoute();
@@ -17,6 +20,7 @@ const invoice = ref<IInvoiceResponse>();
 
 const userRole = ref<TRoleName>(store.getters['userRole']);
 const refChildrenComp = ref();
+const toastRef = ref();
 
 onBeforeMount(async () => {
     const invoiceId = (route.query.invoiceId as string) || '';
@@ -48,13 +52,24 @@ function handlePrint() {
     }, 500);
 }
 
-function notifyToWaiter() {
-    emitPrintOrderDone({
-        invoiceId: invoice.value?._id as string,
-        waiterId: invoice.value?.waiterId as string,
-        message: `In xong hóa đơn cho khách ${invoice.value?.customerName} ở ${invoice.value?.area.areaName} - ${invoice.value?.area.tableName}`,
-    });
-    console.log('notify');
+async function notifyToWaiter() {
+    try {
+        const notification: INotification = {
+            sender: store.getters['userId'],
+            receiver: invoice.value?.waiterId as string,
+            content: `In xong hóa đơn cho khách ${invoice.value?.customerName} ở ${invoice.value?.area.areaName} - ${invoice.value?.area.tableName}`,
+            isRead: false,
+        };
+        const result = await notificationService.create(notification);
+
+        if (result) {
+            const notify = await emitPrintOrderDone(result);
+            console.log(`file: PreviewInvoicePage.vue:59 > notify:`, notify);
+            toastRef.value.showToast();
+        }
+    } catch (error) {
+        console.log(`file: PreviewInvoicePage.vue:71 > error:`, error);
+    }
 }
 </script>
 
@@ -69,6 +84,8 @@ function notifyToWaiter() {
             </div>
             <Button primary rounded :click="handleRequirePayment" v-else>Yêu cầu thanh toán</Button>
         </div>
+
+        <ToastCenter :content="'Đã thông báo cho nhân viên phục vụ'" ref="toastRef" />
     </ScreenBase>
 </template>
 

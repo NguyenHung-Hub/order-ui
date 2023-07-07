@@ -9,7 +9,7 @@ import { onGetInvoicePrint } from './socket/manager.socket';
 
 const store = useStore();
 
-onMounted(() => {
+onMounted(async () => {
     onGetOrderFromCustomer();
     onGetOrderFromWaiter();
     onReceiveInvoiceItemDone();
@@ -31,6 +31,8 @@ onMounted(() => {
         joinRoomShopManager({ shopId, userId });
         document.title = `${store.getters['shopName']} - ${role}`;
     }
+
+    await store.dispatch('fetchNotify', store.getters['userId']);
 });
 </script>
 

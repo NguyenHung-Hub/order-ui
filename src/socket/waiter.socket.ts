@@ -2,7 +2,7 @@ import AppSocket, { IJoinRoomData } from './AppSocket';
 import { IInvoiceResponse } from '../interfaces/invoice.interface';
 import store from '../store';
 import { INotifyPrintOrderDone } from '../interfaces/socket.interface';
-import { INotification } from '../interfaces/notification.interface';
+import { INotification, INotificationResponse } from '../interfaces/notification.interface';
 
 const socket = AppSocket.getInstance({ namespace: 'waiter' });
 
@@ -53,6 +53,10 @@ export const emitInvoiceItemDone = (invoices: IInvoiceResponse[]) => {
     socket.emit('sendInvoiceItemDone', invoices);
 };
 
-export const emitPrintOrderDone = (data: INotifyPrintOrderDone) => {
-    socket.emit('sendPrintOrderDone', data);
+export const emitPrintOrderDone = (data: INotificationResponse): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        socket.emit('sendPrintOrderDone', data, (response: any) => {
+            resolve(response);
+        });
+    });
 };
