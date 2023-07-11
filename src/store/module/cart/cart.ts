@@ -20,7 +20,6 @@ const cartStore: StoreBase = {
         }
         return {
             cart: {
-                userId: '',
                 items: [],
             },
             error: '',

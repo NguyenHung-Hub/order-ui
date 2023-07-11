@@ -94,10 +94,9 @@ function onChangeArea(area: IAreaInfo) {
 }
 
 async function handleOrder() {
-    toggleShowModal();
-    status.value = 'loading';
-
     if (cartItems.value.length > 0) {
+        status.value = 'loading';
+        toggleShowModal();
         const cartItemRequest = cartItems.value.map(
             (item): IInvoiceItem => ({
                 productId: item.product._id as string,
