@@ -3,7 +3,7 @@ import { IProduct, IProductsByCategories } from '../../../interfaces/product.int
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import httpRequest from '../../../utils/httpRequest';
 import * as productService from '../../../services/product.service';
-interface ProductState {
+export interface ProductState {
     products: IProduct[] | [];
     prodByCate: IProductsByCategories[] | [];
     error: any;

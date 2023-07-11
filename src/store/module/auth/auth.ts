@@ -3,7 +3,7 @@ import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import IUser, { IRequestLogin, IUserResponse } from '../../../interfaces/auth.interface';
 import * as authService from '../../../services/auth.service';
 
-interface AuthState {
+export interface AuthState {
     user: IUserResponse | null;
     isAuthenticated: boolean;
     error: any;

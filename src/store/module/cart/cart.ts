@@ -3,13 +3,21 @@ import { ICart, ICartItem } from '../../../interfaces/cart.interface';
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import httpRequest from '../../../utils/httpRequest';
 
-interface CartState {
+export interface CartState {
     cart: ICart;
     error: any;
 }
 
-const categoryStore: StoreBase = {
+const cartStore: StoreBase = {
     state(): CartState {
+        let cartLocal;
+        if (localStorage.getItem('cart')) {
+            cartLocal = JSON.parse(localStorage.getItem('cart') as string) as CartState;
+            return {
+                cart: cartLocal.cart,
+                error: '',
+            };
+        }
         return {
             cart: {
                 userId: '',
@@ -19,6 +27,7 @@ const categoryStore: StoreBase = {
         };
     },
     mutations: {
+        initCartStore(state: CartState) {},
         setCart(state: CartState, cartPayload: ICart) {
             state.cart = cartPayload;
             console.log(state);
@@ -94,14 +103,14 @@ const categoryStore: StoreBase = {
         cart: (state: CartState) => state.cart,
         cartItems: (state: CartState) => state.cart.items,
         countCartItem: (state: CartState) => {
-            if (state.cart.items.length > 0) {
+            if (state.cart.items?.length > 0) {
                 return state.cart.items.reduce((acc, curr) => acc + curr.quantity, 0);
             } else {
                 return 0;
             }
         },
         invoicePrice: (state: CartState) => {
-            if (state.cart.items.length > 0) {
+            if (state.cart.items?.length > 0) {
                 return state.cart.items.reduce((acc, curr) => acc + curr.quantity * curr.product.priceSale, 0);
             } else {
                 return 0;
@@ -110,4 +119,4 @@ const categoryStore: StoreBase = {
     },
 };
 
-export default categoryStore;
+export default cartStore;

@@ -3,7 +3,7 @@ import { ICategory } from '../../../interfaces/category.interface';
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import httpRequest from '../../../utils/httpRequest';
 
-interface CategoryState {
+export interface CategoryState {
     categories: ICategory[] | [];
     error: any;
 }

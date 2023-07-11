@@ -3,7 +3,7 @@ import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import { INotification, IUpdateStatusNotification } from '../../../interfaces/notification.interface';
 import * as notificationService from '../../../services/notification.service';
 
-interface NotificationState {
+export interface NotificationState {
     notifications: INotification[];
     error: any;
 }

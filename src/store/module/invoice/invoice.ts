@@ -3,7 +3,7 @@ import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import { IInvoiceResponse, IInvoiceStatus, TInvoiceStatus } from '../../../interfaces/invoice.interface';
 import * as invoiceService from '../../../services/invoice.service';
 
-interface InvoicesState {
+export interface InvoicesState {
     invoices: IInvoiceStatus;
     error: any;
 }

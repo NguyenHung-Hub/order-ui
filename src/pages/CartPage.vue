@@ -119,6 +119,7 @@ async function handleOrder() {
                 console.log(result._id);
 
                 cookie.setCookie('invoice', JSON.stringify(result), 24 * 60 * 60 * 1000);
+                localStorage.removeItem('cart');
             }
         } catch (error) {
             status.value = 'error';

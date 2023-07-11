@@ -3,7 +3,7 @@ import { IArea } from '../../../interfaces/area.interface';
 import { RootState, StoreBase } from '../../../interfaces/store.interface';
 import httpRequest from '../../../utils/httpRequest';
 
-interface AreaState {
+export interface AreaState {
     areas: IArea[] | [];
     error: any;
 }
