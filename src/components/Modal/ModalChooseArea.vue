@@ -85,8 +85,8 @@ function handleChooseArea() {
 <template>
     <ModalBase header @on-close="emitOnClose">
         <div class="head">
-            <Select :label="'Khu vực'" :options="optionsArea.areas" @value="onChangeArea" />
-            <Select :label="'Bàn'" :options="optionsArea.tables" @value="onChangeTable" />
+            <Select :label="'Khu vực'" :options="optionsArea.areas" :selected="selected.areaId" @value="onChangeArea" />
+            <Select :label="'Bàn'" :options="optionsArea.tables" :selected="selected.tableId" @value="onChangeTable" />
         </div>
         <Button success :click="handleChooseArea">Xong</Button>
     </ModalBase>

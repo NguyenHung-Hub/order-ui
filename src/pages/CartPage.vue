@@ -22,7 +22,7 @@ import { useRouter } from 'vue-router';
 const cartItems = ref<ICartItem[]>([]);
 const countCart = ref<string>('');
 const invoicePrice = ref<number>(0);
-const area = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
+// const area = reactive<IAreaInfo>({ areaId: '', areaName: '', tableId: '', tableName: '' });
 const store = useStore();
 const router = useRouter();
 
@@ -46,6 +46,14 @@ onMounted(async () => {
     selected.tableId = areaFirst.tables[0]._id as string;
     selected.tableName = areaFirst.tables[0].name;
 
+    if (cookie.getCookie('area')) {
+        const areaLocal: IAreaInfo = JSON.parse(cookie.getCookie('area') || '');
+
+        selected.areaId = areaLocal.areaId;
+        selected.areaName = areaLocal.areaName;
+        selected.tableId = areaLocal.tableId;
+        selected.tableName = areaLocal.tableName;
+    }
     getInvoiceCookie();
 });
 
@@ -74,6 +82,15 @@ async function updateQuantity(value: number, cartItem: ICartItem) {
 
 async function removeCartItem(cartItem: ICartItem) {
     await store.dispatch('removeCartItem', cartItem);
+}
+
+function onChangeArea(area: IAreaInfo) {
+    selected.areaId = area.areaId;
+    selected.areaName = area.areaName;
+    selected.tableId = area.tableId;
+    selected.tableName = area.tableName;
+
+    cookie.setCookie('area', JSON.stringify(area), 24 * 60 * 60 * 1000);
 }
 
 async function handleOrder() {
@@ -192,12 +209,7 @@ function handlePreviewInvoice() {
 
     <ModalChooseArea
         @cancel="() => (isShowModalArea = false)"
-        @value="(value:IAreaInfo)=>{
-        area.areaId= value.areaId;
-        area.areaName=value.areaName;
-        area.tableId= value.tableId;
-        area.tableName=value.tableName;
-    }"
+        @value="onChangeArea"
         :areas="areas"
         :selected="selected"
         v-if="isShowModalArea"

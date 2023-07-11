@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 export interface IOption {
     value: string;
@@ -10,6 +10,7 @@ interface Props {
     vertical?: boolean;
     label?: string;
     width?: number;
+    selected?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     width: 100,
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{ (event: 'value', value: string, name: string): void }>();
 const selectWidth = computed(() => `${props.width}px`);
+const selectedValue = ref<string>(props.selected || props.options[0].value);
 
 function onChange(event: any) {
     const name = props.options.find((i) => i.value == event.target.value)?.name;
@@ -27,7 +29,7 @@ function onChange(event: any) {
 <template>
     <div class="select__wrapper" :class="{ vertical: vertical }">
         <label v-if="label">{{ label }}</label>
-        <select @change="onChange">
+        <select @change="onChange" v-model="selectedValue">
             <option v-for="(option, index) in props.options" :key="index" :value="option.value">
                 {{ option.name }}
             </option>
