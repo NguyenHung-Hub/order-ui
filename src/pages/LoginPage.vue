@@ -8,6 +8,10 @@ import { useRouter } from 'vue-router';
 import { routesName } from '../router';
 import { joinRoomShopWaiter } from '../socket/waiter.socket';
 import roleName from '../config/roleName';
+import { joinRoomShopChef } from '../socket/chef.socket';
+import { joinRoomShopManager } from '../socket/manager.socket';
+
+import { joinRoomSocket } from '../socket/utils.socket';
 
 const store = useStore();
 const router = useRouter();
@@ -26,18 +30,36 @@ function setPassword(value: string) {
 async function handleLogin() {
     try {
         if (email.value.trim() != '' && password.value.trim() != '') {
-            const result = await authService.login(email.value, password.value);
+            const userLogin = await authService.login(email.value, password.value);
 
-            if (result) {
-                await store.dispatch('setUser', result);
+            if (userLogin) {
+                await store.dispatch('setUser', userLogin);
 
-                if (result.role.name == roleName.WAITER) {
-                    router.push({ path: `/${result?.shop.name}/waiter` });
-                } else if (result.role.name == roleName.CHEF) {
-                    router.push({ path: `/${result?.shop.name}/chef` });
+                console.log('login.vue 1');
+
+                const role = store.getters['userRole'];
+                const userId = store.getters['userId'];
+                const shopId = store.getters['shopId'];
+
+                if (userLogin.role.name == roleName.WAITER) {
+                    router.push({ path: `/${userLogin?.shop.name}/waiter` });
+                    document.title = `${store.getters['shopName']} - ${role}`;
+                } else if (userLogin.role.name == roleName.CHEF) {
+                    document.title = `${store.getters['shopName']} - ${role}`;
+                    router.push({ path: `/${userLogin?.shop.name}/chef` });
+                } else if (userLogin.role.name == roleName.MANAGER) {
+                    router.push({ path: `/${userLogin?.shop.name}` });
+                    document.title = `${store.getters['shopName']} - ${role}`;
                 } else {
-                    router.push({ path: `/${result?.shop.name}` });
+                    router.push({ path: `/${userLogin?.shop.name}` });
+                    document.title = `${store.getters['shopName']} `;
                 }
+
+                joinRoomSocket(userLogin);
+
+                await store.dispatch('fetchNotify', store.getters['userId']);
+
+                console.log('login.vue 2');
             }
         }
     } catch (error) {

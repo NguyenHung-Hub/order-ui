@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { joinRoomShopWaiter, onGetOrderFromCustomer, onReceiveInvoiceItemDone } from './socket/waiter.socket';
-import { joinRoomShopChef, onGetOrderFromWaiter } from './socket/chef.socket';
+import { onGetOrderFromCustomer, onReceiveInvoiceItemDone } from './socket/waiter.socket';
+import { onGetOrderFromWaiter } from './socket/chef.socket';
 import { useStore } from 'vuex';
-import roleName from './config/roleName';
-import { joinRoomShopManager } from './socket/manager.socket';
 import { onGetInvoicePrint } from './socket/manager.socket';
+import { IUserResponse } from './interfaces/auth.interface';
+import { joinRoomSocket } from './socket/utils.socket';
 
 const store = useStore();
 
@@ -15,24 +15,12 @@ onMounted(async () => {
     onReceiveInvoiceItemDone();
     onGetInvoicePrint();
 
-    const role = store.getters['userRole'];
-    const userId = store.getters['userId'];
-    const shopId = store.getters['shopId'];
+    const user: IUserResponse = store.getters['user'];
 
-    if (role == roleName.CUSTOMER) {
-        document.title = `${store.getters['shopName']}`;
-    } else if (role == roleName.WAITER) {
-        joinRoomShopWaiter({ shopId, userId });
-        document.title = `${store.getters['shopName']} - ${role}`;
-    } else if (role == roleName.CHEF) {
-        joinRoomShopChef(shopId);
-        document.title = `${store.getters['shopName']} - ${role}`;
-    } else if (role == roleName.MANAGER) {
-        joinRoomShopManager({ shopId, userId });
-        document.title = `${store.getters['shopName']} - ${role}`;
+    if (user) {
+        joinRoomSocket(user);
+        await store.dispatch('fetchNotify', user._id);
     }
-
-    await store.dispatch('fetchNotify', store.getters['userId']);
 });
 </script>
 

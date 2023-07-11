@@ -55,8 +55,13 @@ const notificationStore: StoreBase = {
 
     getters: {
         notifications: (state: NotificationState) => state.notifications,
-        countNotification: (state: NotificationState) =>
-            state.notifications.reduce((acc, curr) => (curr.isRead ? acc : acc + 1), 0),
+        countNotification: (state: NotificationState) => {
+            if (state.notifications) {
+                return state.notifications.reduce((acc, curr) => (curr.isRead ? acc : acc + 1), 0);
+            } else {
+                return 0;
+            }
+        },
     },
 };
 
