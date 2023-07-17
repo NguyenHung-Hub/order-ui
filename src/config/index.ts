@@ -7,4 +7,6 @@ const config = {
     PORT: import.meta.env.VITE_API_PORT,
 };
 
+console.log(process.env.NODE_ENV);
+
 export default config;

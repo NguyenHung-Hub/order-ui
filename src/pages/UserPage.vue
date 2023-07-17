@@ -13,6 +13,7 @@ import * as invoiceService from '../services/invoice.service';
 import * as dashboardService from '../services/dashboard.service';
 import { formatMoneyStr } from '../utils/format';
 import { routesName } from '../router';
+import roleName from '../config/roleName';
 
 const store = useStore();
 const shopName = store.getters['shopName'];
@@ -23,6 +24,7 @@ const dashboardData = ref<IDashboardData>({
     invoiceCount: 0,
     totalMoney: 0,
 });
+const role = store.getters['userRole'];
 
 onMounted(async () => {
     try {
@@ -53,7 +55,7 @@ onMounted(async () => {
         <div class="scroll-container">
             <HeaderProfile class="header" />
 
-            <div class="feature__wrapper">
+            <div class="feature__wrapper" v-if="role == roleName.MANAGER">
                 <div class="feature">
                     <Button class="feature-btn" :vertical="true" :to-name="routesName.QrPage">
                         <QrIcon />
@@ -81,7 +83,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div class="dashboard__wrapper">
+            <div class="dashboard__wrapper" v-if="role == roleName.MANAGER">
                 <div class="statistics__wrapper">
                     <div class="statistic__box">
                         <span class="statistic-number">{{ dashboardData?.tableCount }}</span>
@@ -102,7 +104,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div class="feature-list">
+            <div class="feature-list" v-if="role == roleName.CUSTOMER">
                 <Button full class="btn-flat" :to-name="routesName.OrderHistoryPage">
                     <span>Đơn mua</span>
                     <ChervonRightIcon :color="`#ccc`" />
@@ -112,8 +114,20 @@ onMounted(async () => {
                     <ChervonRightIcon :color="`#ccc`" />
                 </Button>
             </div>
+            <div class="feature-list mt-8" v-if="role == roleName.CUSTOMER">
+                <ProductSection :title="'Món đã đặt'" :products="purchasedProduct" v-if="purchasedProduct" />
+            </div>
 
-            <ProductSection :title="'Món đã đặt'" :products="purchasedProduct" v-if="purchasedProduct" />
+            <div class="feature-list mt-8">
+                <Button full class="btn-flat">
+                    <span>Thông tin tài khoản</span>
+                    <ChervonRightIcon :color="`#ccc`" />
+                </Button>
+                <Button full class="btn-flat">
+                    <span>Đăng xuất</span>
+                    <ChervonRightIcon :color="`#ccc`" />
+                </Button>
+            </div>
         </div>
     </div>
 </template>
@@ -131,6 +145,10 @@ onMounted(async () => {
     .scroll-container {
         overflow-y: scroll;
         padding-bottom: $footer-height;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
         .feature__wrapper {
             @include flex-center();
