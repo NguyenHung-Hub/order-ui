@@ -4,6 +4,7 @@ import Button from '../Button.vue';
 import ModalBase from '../ModalBase.vue';
 import Select, { IOption } from '../Select.vue';
 import { IArea, IAreaInfo } from '../../interfaces/area.interface';
+import { ITable } from '../../interfaces/table.interface';
 
 interface Props {
     areas: IArea[];
@@ -48,10 +49,10 @@ watch(
 );
 
 function updateOptionData(areas: IArea[]) {
-    optionsArea.tables = areas.reduce((acc, curr) => {
+    optionsArea.tables = areas.reduce((acc: IOption[], curr: IArea) => {
         if (curr._id === selected.areaId) {
             return curr.tables.reduce(
-                (acc2, curr2) => [...acc2, { name: curr2.name, value: curr2._id } as IOption],
+                (acc2: IOption[], curr2: ITable) => [...acc2, { name: curr2.name, value: curr2._id } as IOption],
                 [] as IOption[],
             );
         }
