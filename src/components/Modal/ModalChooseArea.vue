@@ -49,15 +49,28 @@ watch(
 );
 
 function updateOptionData(areas: IArea[]) {
-    optionsArea.tables = areas.reduce((acc: IOption[], curr: IArea) => {
-        if (curr._id === selected.areaId) {
-            return curr.tables.reduce(
-                (acc2: IOption[], curr2: ITable) => [...acc2, { name: curr2.name, value: curr2._id } as IOption],
-                [] as IOption[],
-            );
-        }
-        return acc;
-    }, [] as IOption[]);
+    //this way is wrong when running command yarn yarn build
+    // optionsArea.tables = areas.reduce((acc: IOption[], curr: IArea) => {
+    //     if (curr._id === selected.areaId) {
+    //         const result = curr.tables.reduce(
+    //             (acc2: IOption[], curr2: ITable) => [...acc2, { name: curr2.name, value: curr2._id } as IOption],
+    //             [],
+    //         );
+
+    //         console.log(`file: ModalChooseArea.vue:60 > result:`, result);
+    //         return result;
+    //     }
+    //     console.log(`file: ModalChooseArea.vue:63 > acc:`, acc);
+    //     return acc;
+    // }, []);
+
+    const findArea = areas.find((area: IArea) => area._id === selected.areaId);
+    if (findArea) {
+        const optionsTable = findArea.tables.map((table: ITable) => {
+            return { name: table.name, value: table._id } as IOption;
+        }, [] as IOption[]);
+        optionsArea.tables = optionsTable;
+    }
 }
 
 function onChangeArea(value: string, name: string) {

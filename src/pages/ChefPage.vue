@@ -27,42 +27,38 @@ const MINUTES_GROUP = 5;
 const handleMap = (invoiceStatus: IInvoiceStatus) => {
     if (invoiceStatus) {
         const invoiceStatusCopy = cloneDeep(invoiceStatus);
-        // const invoiceStatusCopy = invoiceStatus;
-        console.log(`file: C hefPage.vue:22 > invoiceStatusCopy:`, invoiceStatusCopy);
 
-        const step1 = invoiceStatusCopy.serving.reduce<IInvoiceResponse[][]>(
-            (acc: IInvoiceResponse[][], curr: IInvoiceResponse, index: number) => {
-                if (index == 0) {
-                    return [[curr]];
-                }
-                const t = new Date(curr.createdAt as string);
+        // [
+        //     [IInvoiceResponse,IInvoiceResponse,IInvoiceResponse],
+        //     [IInvoiceResponse,IInvoiceResponse],
+        //     [IInvoiceResponse,IInvoiceResponse,IInvoiceResponse,IInvoiceResponse],
+        //     [IInvoiceResponse],
+        // ]
 
-                let findIndexPush = -1;
-                acc.forEach((itemAcc, index) => {
+        //other way
+
+        const step1: Array<IInvoiceResponse[]> = [];
+        invoiceStatus.serving.forEach((invoice: IInvoiceResponse, index: number) => {
+            if (index == 0) {
+                step1.push([invoice]);
+            } else {
+                const t = new Date(invoice.createdAt as string);
+                let findIndexToPush = -1;
+                step1.forEach((itemAcc, index) => {
                     const t2 = new Date(itemAcc[0].createdAt as string);
-                    console.log(`Time: `, itemAcc[0].createdAt, ' - ', curr.createdAt);
-                    console.log(`Time: `, t2.toLocaleTimeString(), ' - ', t.toLocaleTimeString());
                     t2.setMinutes(t2.getMinutes() + MINUTES_GROUP);
                     if (t.getTime() < t2.getTime()) {
-                        findIndexPush = index;
+                        findIndexToPush = index;
                     }
-                    console.log('for : ', index);
                 });
 
-                if (findIndexPush < 0) {
-                    console.log('index < 0 : ', findIndexPush);
-                    return [...acc, [curr]];
+                if (findIndexToPush < 0) {
+                    step1.push([invoice]);
+                } else {
+                    step1[findIndexToPush].push(invoice);
                 }
-
-                const arr = [...acc];
-                console.log({ arr });
-                arr[findIndexPush].push(curr);
-                console.log({ arr });
-                return arr;
-            },
-            [] as IInvoiceResponse[][],
-        );
-        console.log(`file: ChefPage.vue:48 > TEMP:`, step1);
+            }
+        });
 
         const step2 = step1.map((group: IInvoiceResponse[]) => {
             return group.reduce((acc: IInvoiceGroup[], curr: IInvoiceResponse) => {

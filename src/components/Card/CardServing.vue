@@ -76,7 +76,7 @@ watchEffect(() => {
 
     <ModalDeliveredFood
         :invoice-id="invoiceId"
-        :product-id="invoiceItem.product._id"
+        :product-id="(invoiceItem.product._id as string)"
         :product-name="invoiceItem.product.name"
         :table="`${invoiceArea}`"
         :quantity="invoiceItem.quantity"
