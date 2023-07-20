@@ -20,6 +20,7 @@ class AppSocket {
             AppSocket.manager = new Manager(AppSocket.baseUrl, {
                 reconnectionDelay: 5000,
                 reconnectionAttempts: 50,
+                withCredentials: true,
             });
         }
 
