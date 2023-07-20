@@ -13,7 +13,7 @@ export interface IJoinRoomData {
 class AppSocket {
     private static socket: Socket;
     private static manager: Manager;
-    private static baseUrl = config.PROD ? `${config.SOCKET_URL}` : `ws://${config.DOMAIN}:${config.PORT}`;
+    private static baseUrl = config.PROD ? `${config.SOCKET_URL}` : `https://noworderapi.onrender.com/`;
 
     public static getInstance({ namespace = 'customer' }: Namespace) {
         if (!AppSocket.manager) {
