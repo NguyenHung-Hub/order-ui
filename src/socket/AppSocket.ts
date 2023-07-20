@@ -24,6 +24,7 @@ class AppSocket {
                 extraHeaders: {
                     'my-custom-header': 'abcd',
                 },
+                transports: ['websocket', 'polling'],
             });
         }
 
