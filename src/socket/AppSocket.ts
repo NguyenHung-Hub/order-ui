@@ -21,6 +21,9 @@ class AppSocket {
                 reconnectionDelay: 5000,
                 reconnectionAttempts: 50,
                 withCredentials: true,
+                extraHeaders: {
+                    'my-custom-header': 'abcd',
+                },
             });
         }
 
