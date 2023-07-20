@@ -25,6 +25,7 @@ import NotifyPage from './pages/NotifyPage.vue';
 import store from './store';
 
 export const routesName = {
+    Welcome: 'Welcome',
     HomePage: 'HomePage',
     CategoryPage: 'CategoryPage',
     CartPage: 'CartPage',
@@ -48,6 +49,20 @@ export const routesName = {
 const shopName = store.getters['shopName'];
 const pathRoot = `/${shopName}`;
 const routes: RouteRecordRaw[] = [
+    {
+        path: '',
+        name: 'Welcome',
+        component: EmptyLayout,
+
+        children: [
+            {
+                path: '',
+                name: routesName.Welcome,
+                component: () => import('./pages/WelcomePage.vue'),
+                meta: { requiresAuth: false },
+            },
+        ],
+    },
     {
         path: '/:shop',
         name: 'Root',
